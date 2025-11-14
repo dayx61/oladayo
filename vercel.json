@@ -1,5 +1,6 @@
 {
-  "rootDirectory": "client",
+  "buildCommand": "npm run build",
+  "outputDirectory": "client/dist",
   "nodeVersion": "20.x",
   "env": {
     "OPENROUTER_API_KEY": "@openrouter_api_key",
@@ -8,7 +9,7 @@
     "EMAIL_PASSWORD": "@email_password"
   },
   "functions": {
-    "../server/dist/index.js": {
+    "server/dist/index.js": {
       "memory": 1024,
       "maxDuration": 60
     }
