@@ -21,26 +21,26 @@ export default function PremiumNavigation() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 transition-colors duration-300
-      light:bg-light-bg/80 light:border-b light:border-light-border
-      dark:bg-dark-bg/80 dark:border-b dark:border-dark-border
-      backdrop-blur-xl">
+      light:bg-white light:border-b light:border-light-border
+      dark:bg-dark-bg dark:border-b dark:border-dark-border
+      backdrop-blur-md shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
+          <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
             <img src="/logo.png" alt="Oladayo Logo" className="w-10 h-10 rounded-lg group-hover:shadow-lg group-hover:shadow-premium-accent/50 transition-all" />
             <span className="font-bold text-lg light:text-light-text dark:text-dark-text hidden sm:inline">Oladayo</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-0.5">
             {links.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className="px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300
-                  light:text-light-text-secondary light:hover:text-light-text light:hover:bg-light-bg-secondary
-                  dark:text-dark-text-secondary dark:hover:text-dark-text dark:hover:bg-dark-bg-secondary"
+                className="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200
+                  light:text-light-text light:hover:text-premium-accent light:hover:bg-light-bg-secondary
+                  dark:text-dark-text dark:hover:text-premium-accent dark:hover:bg-dark-bg-secondary"
               >
                 {link.name}
               </Link>
@@ -48,18 +48,21 @@ export default function PremiumNavigation() {
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <ThemeToggle />
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden p-2 rounded-lg light:hover:bg-light-border dark:hover:bg-dark-border transition-colors"
+              className="md:hidden p-2 rounded-lg transition-all duration-200
+                light:text-light-text light:hover:bg-light-bg-secondary
+                dark:text-dark-text dark:hover:bg-dark-bg-secondary"
+              aria-label="Toggle menu"
             >
               {isOpen ? (
-                <X size={24} className="light:text-light-text dark:text-premium-accent" />
+                <X size={24} className="light:text-light-text dark:text-dark-text" />
               ) : (
-                <Menu size={24} className="light:text-light-text dark:text-premium-accent" />
+                <Menu size={24} className="light:text-light-text dark:text-dark-text" />
               )}
             </button>
           </div>
@@ -67,15 +70,15 @@ export default function PremiumNavigation() {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden pb-4 border-t light:border-light-border dark:border-dark-border animate-slideUp">
+          <div className="md:hidden pb-4 border-t light:border-light-border dark:border-dark-border light:bg-light-bg-secondary/50 dark:bg-dark-bg-secondary/50 animate-slideUp">
             {links.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 onClick={() => setIsOpen(false)}
-                className="block px-4 py-3 transition-all duration-300 font-medium
-                  light:text-light-text-secondary light:hover:text-light-text light:hover:bg-light-bg-secondary
-                  dark:text-dark-text-secondary dark:hover:text-dark-text dark:hover:bg-dark-bg-secondary"
+                className="block px-4 py-3 transition-all duration-200 font-medium
+                  light:text-light-text light:hover:text-premium-accent light:hover:bg-light-bg
+                  dark:text-dark-text dark:hover:text-premium-accent dark:hover:bg-dark-bg"
               >
                 {link.name}
               </Link>

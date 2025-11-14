@@ -23,7 +23,8 @@ export default function App() {
           light:bg-light-bg light:text-light-text
           dark:bg-dark-bg dark:text-dark-text">
           <PremiumNavigation />
-          <Routes>
+          <main className="pt-16">
+            <Routes>
             <Route path="/" element={<PremiumHome />} />
             <Route path="/about" element={<About />} />
             <Route path="/experience" element={<Experience />} />
@@ -34,7 +35,8 @@ export default function App() {
             <Route path="/resources" element={<Resources />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/contact" element={<Contact />} />
-          </Routes>
+            </Routes>
+          </main>
           <Footer />
           <ChatbotWidget />
         </div>
