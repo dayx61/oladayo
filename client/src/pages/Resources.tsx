@@ -1,3 +1,4 @@
+import React from 'react';
 import { Download, ExternalLink, FileText, Video, BookOpen } from 'lucide-react';
 
 interface Resource {
