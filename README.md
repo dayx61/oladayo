@@ -1,6 +1,6 @@
-# Oladayo Alabi - Professional Portfolio 🌟
+# Professional IT Portfolio 🌟
 
-[![Live Demo](https://img.shields.io/badge/🌐-View_Portfolio-0066cc?style=for-the-badge)](https://oladayo.vercel.app/)
+[![Live Demo](https://img.shields.io/badge/🌐-View_Portfolio-0066cc?style=for-the-badge)](https://portfolio.vercel.app/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white&style=flat)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB&style=flat)](https://reactjs.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-43853D?logo=node.js&logoColor=white&style=flat)](https://nodejs.org/)
@@ -88,7 +88,7 @@ A cutting-edge, full-stack portfolio website showcasing modern web technologies 
 ## 📦 **Project Structure**
 
 ```
-oladayo-portfolio/
+professional-it-portfolio/
 ├── README.md                  # Project documentation
 ├── package.json               # Monorepo workspace config
 ├── package-lock.json          # Dependency lockfile
@@ -99,11 +99,11 @@ oladayo-portfolio/
 │   ├── public/                # Static assets
 │   ├── src/
 │   │   ├── components/        # Reusable UI components
-│   │   ├── context/          # React contexts (Theme)
-│   │   ├── pages/            # Page components & routing
-│   │   ├── App.tsx           # Main app component
-│   │   ├── App.css           # Global styles & animations
-│   │   └── main.tsx          # Vite entry point
+│   │   ├── context/           # React contexts (Theme)
+│   │   ├── pages/             # Page components & routing
+│   │   ├── App.tsx            # Main app component
+│   │   ├── App.css            # Global styles & animations
+│   │   └── main.tsx           # Vite entry point
 │   ├── index.html             # HTML template
 │   ├── package.json           # Frontend dependencies
 │   ├── vite.config.ts         # Vite build configuration
@@ -117,10 +117,7 @@ oladayo-portfolio/
 │   │   └── index.ts           # Main server & API routes
 │   ├── .env                   # Environment variables (gitignored)
 │   ├── package.json           # Backend dependencies
-│   ├── tsconfig.json          # TypeScript config
-│   ├── package-lock.json      # Backend lockfile
-│   ├── dist/                  # Compiled JavaScript (gitignored)
-│   └── node_modules/          # Backend dependencies
+│   └── tsconfig.json          # TypeScript config
 ├── node_modules/              # Monorepo dependencies
 └── .git/                      # Git repository metadata
 ```
@@ -136,7 +133,7 @@ oladayo-portfolio/
 
 ```bash
 # Clone repository
-cd oladayo-portfolio
+cd professional-it-portfolio
 
 # Install all dependencies (monorepo)
 npm install
@@ -239,7 +236,7 @@ To enable contact form emails:
 ## 📊 AI Chatbot Features
 
 - **Context-Aware**: Remembers conversation history
-- **Multi-Topic**: Answers about Oladayo's background and general questions
+- **Multi-Topic**: Answers about professional background and general questions
 - **Professional Tone**: Maintains professional communication
 - **Metadata Tracking**: Logs token usage and timestamps
 - **Error Handling**: Graceful fallbacks for API failures
@@ -271,12 +268,6 @@ Modify `client/src/App.css` for custom animations and styles
 ## 📝 License
 
 This project is personal and proprietary.
-
-## 👤 Contact
-
-- Email: alabioladayoibrahim@hotmail.com
-- Phone: +1 267-957-4048
-- LinkedIn: https://www.linkedin.com/in/olaalabi53
 
 ---
 
@@ -310,4 +301,4 @@ This project is personal and proprietary.
 
 ---
 
-Built with ❤️ and cutting-edge technologies by [@olaalabi](https://github.com/olaalabi) | 2025
+Built with ❤️ and cutting-edge technologies | 2025
