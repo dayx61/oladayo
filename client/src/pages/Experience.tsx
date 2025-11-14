@@ -75,55 +75,60 @@ const experiences = [
 
 export default function Experience() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <h1 className="text-5xl font-bold mb-12 gradient-text">Professional Experience</h1>
+    <div className="min-h-screen pt-24 pb-20 px-4 sm:px-6 lg:px-8
+      light:bg-light-bg light:text-light-text
+      dark:bg-dark-bg dark:text-dark-text
+      transition-colors duration-300">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-5xl font-bold mb-12 gradient-text">Professional Experience</h1>
 
-      <div className="space-y-8">
-        {experiences.map((exp, idx) => (
-          <div key={idx} className="glass p-8 rounded-xl border-l-4 border-blue-500 hover:border-purple-500 transition-smooth">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <Briefcase className="text-blue-400" size={24} />
-                  <h3 className="text-2xl font-bold">{exp.position}</h3>
+        <div className="space-y-8">
+          {experiences.map((exp, idx) => (
+            <div key={idx} className="light:bg-light-bg-secondary light:border light:border-light-border dark:bg-dark-bg-secondary dark:border dark:border-dark-border rounded-xl p-8 border-l-4 border-premium-accent hover:border-premium-blue transition-all duration-300">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <Briefcase className="text-premium-accent" size={24} />
+                    <h3 className="text-2xl font-bold light:text-light-text dark:text-dark-text">{exp.position}</h3>
+                  </div>
+                  <p className="text-premium-accent font-semibold text-lg">{exp.company}</p>
                 </div>
-                <p className="text-blue-400 font-semibold text-lg">{exp.company}</p>
+              </div>
+
+              <div className="mb-4 space-y-1">
+                <p className="light:text-light-text-secondary dark:text-dark-text-secondary text-sm">{exp.duration}</p>
+                <p className="light:text-light-text-secondary dark:text-dark-text-secondary text-sm">{exp.location}</p>
+              </div>
+
+              <div className="space-y-2">
+                {exp.highlights.map((highlight, hidx) => (
+                  <div key={hidx} className="flex items-start gap-3">
+                    <CheckCircle className="text-premium-green flex-shrink-0 mt-1" size={18} />
+                    <p className="light:text-light-text-secondary dark:text-dark-text-secondary">{highlight}</p>
+                  </div>
+                ))}
               </div>
             </div>
-
-            <div className="mb-4 space-y-1">
-              <p className="text-gray-400 text-sm">{exp.duration}</p>
-              <p className="text-gray-400 text-sm">{exp.location}</p>
-            </div>
-
-            <div className="space-y-2">
-              {exp.highlights.map((highlight, hidx) => (
-                <div key={hidx} className="flex items-start gap-3">
-                  <CheckCircle className="text-green-400 flex-shrink-0 mt-1" size={18} />
-                  <p className="text-gray-300">{highlight}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-16 glass p-12 rounded-xl">
-        <h2 className="text-3xl font-bold mb-6 gradient-text">Key Achievements</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {[
-            { title: '7+ Years', description: 'Experience in IT and Cybersecurity' },
-            { title: '1,500+', description: 'PCs Successfully Migrated' },
-            { title: '99%', description: 'Customer Satisfaction Rating' },
-            { title: '60%', description: 'Phishing Susceptibility Reduction' },
-            { title: '50%', description: 'Incident Resolution Time Improvement' },
-            { title: '800+', description: 'Users Supported' }
-          ].map((achievement, idx) => (
-            <div key={idx} className="border-l-4 border-purple-500 pl-6">
-              <p className="text-3xl font-bold gradient-text mb-2">{achievement.title}</p>
-              <p className="text-gray-400">{achievement.description}</p>
-            </div>
           ))}
+        </div>
+
+        <div className="mt-16 light:bg-light-bg-secondary light:border light:border-light-border dark:bg-dark-bg-secondary dark:border dark:border-dark-border rounded-xl p-12 transition-all duration-300">
+          <h2 className="text-3xl font-bold mb-6 gradient-text">Key Achievements</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              { title: '7+ Years', description: 'Experience in IT and Cybersecurity' },
+              { title: '1,500+', description: 'PCs Successfully Migrated' },
+              { title: '99%', description: 'Customer Satisfaction Rating' },
+              { title: '60%', description: 'Phishing Susceptibility Reduction' },
+              { title: '50%', description: 'Incident Resolution Time Improvement' },
+              { title: '800+', description: 'Users Supported' }
+            ].map((achievement, idx) => (
+              <div key={idx} className="border-l-4 border-premium-accent pl-6">
+                <p className="text-3xl font-bold gradient-text mb-2">{achievement.title}</p>
+                <p className="light:text-light-text-secondary dark:text-dark-text-secondary">{achievement.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
