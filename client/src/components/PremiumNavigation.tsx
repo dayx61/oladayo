@@ -20,9 +20,7 @@ export default function PremiumNavigation() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-premium-accent to-premium-blue flex items-center justify-center font-bold text-premium-darker group-hover:shadow-lg group-hover:shadow-premium-accent/50 transition-all">
-              OA
-            </div>
+            <img src="/logo.png" alt="Oladayo Logo" className="w-10 h-10 rounded-lg group-hover:shadow-lg group-hover:shadow-premium-accent/50 transition-all" />
             <span className="font-bold text-lg text-white hidden sm:inline">Oladayo</span>
           </Link>
 
