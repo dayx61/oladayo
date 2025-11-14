@@ -89,29 +89,40 @@ A cutting-edge, full-stack portfolio website showcasing modern web technologies 
 
 ```
 oladayo-portfolio/
-├── client/                     # React frontend
-│   ├── src/
-│   │   ├── components/         # Reusable UI components
-│   │   ├── context/           # React contexts (Theme)
-│   │   ├── pages/             # Page components (Home, About, etc.)
-│   │   ├── App.tsx            # Main app component
-│   │   ├── App.css            # Global styles & animations
-│   │   └── main.tsx           # Vite entry point
+├── README.md                  # Project documentation
+├── package.json               # Monorepo workspace config
+├── package-lock.json          # Dependency lockfile
+├── .stylelintrc.json          # CSS linting rules
+├── .gitignore                 # Git ignore patterns
+├── vercel.json                # Vercel deployment config
+├── client/                    # React frontend application
 │   ├── public/                # Static assets
+│   ├── src/
+│   │   ├── components/        # Reusable UI components
+│   │   ├── context/          # React contexts (Theme)
+│   │   ├── pages/            # Page components & routing
+│   │   ├── App.tsx           # Main app component
+│   │   ├── App.css           # Global styles & animations
+│   │   └── main.tsx          # Vite entry point
+│   ├── index.html             # HTML template
 │   ├── package.json           # Frontend dependencies
-│   ├── vite.config.ts         # Build configuration
-│   ├── tailwind.config.js     # Custom colors & themes
-│   └── tsconfig.json          # TypeScript configuration
-├── server/                     # Express backend
+│   ├── vite.config.ts         # Vite build configuration
+│   ├── tailwind.config.js     # Tailwind CSS theme config
+│   ├── postcss.config.js      # PostCSS processing
+│   ├── tsconfig.json          # TypeScript configuration
+│   ├── tsconfig.node.json     # Node.js TypeScript config
+│   └── .eslintrc.json         # ESLint configuration
+├── server/                    # Express.js backend application
 │   ├── src/
 │   │   └── index.ts           # Main server & API routes
-│   ├── dist/                  # Compiled JavaScript
+│   ├── .env                   # Environment variables (gitignored)
 │   ├── package.json           # Backend dependencies
-│   └── tsconfig.json          # TypeScript config
-├── .stylelintrc.json         # CSS linting rules
-├── package.json              # Monorepo workspace config
-├── vercel.json               # Vercel deployment config
-└── README.md                 # This file
+│   ├── tsconfig.json          # TypeScript config
+│   ├── package-lock.json      # Backend lockfile
+│   ├── dist/                  # Compiled JavaScript (gitignored)
+│   └── node_modules/          # Backend dependencies
+├── node_modules/              # Monorepo dependencies
+└── .git/                      # Git repository metadata
 ```
 
 ## 🚀 Getting Started
