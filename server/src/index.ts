@@ -147,7 +147,7 @@ CERTIFICATIONS:
 ${portfolioData.certifications.join(', ')}
 
 EXPERIENCE HIGHLIGHTS:
-${portfolioData.experience.map(exp => 
+${portfolioData.experience.map(exp =>
   `${exp.company} - ${exp.position} (${exp.duration}): ${exp.highlights.join('; ')}`
 ).join('\n')}
 
@@ -161,10 +161,128 @@ INSTRUCTIONS:
 `;
 }
 
+// Smart fallback response generator
+function generateSmartFallback(message: string, category: string): { message: string; metadata: any } {
+  const lowerMessage = message.toLowerCase();
+  const timestamp = new Date().toISOString();
+
+  // Smart response mapping based on keywords
+  if (lowerMessage.includes('ceo') || lowerMessage.includes('amazon') || lowerMessage.includes('jeff') || lowerMessage.includes('bezos')) {
+    return {
+      message: "I appreciate you asking about business leaders! While I'm primarily here to help with Oladayo Alabi's background and expertise, it's worth noting that Andy Jassy has been the CEO of Amazon since July 2021, previously serving as CEO of Amazon Web Services (AWS).\n\nIf you'd like to discuss Oladayo Alabi's information technology leadership experience, I'd be happy to share details about his 7+ years in IT service management, cybersecurity, and technical support.",
+      metadata: {
+        category: 'general_business',
+        fallback: true,
+        topic: 'business_leaders',
+        timestamp: timestamp
+      }
+    };
+  }
+
+  if (lowerMessage.includes('experience') || lowerMessage.includes('background') || lowerMessage.includes('cv') || lowerMessage.includes('resume')) {
+    return {
+      message: `Here's an overview of Oladayo Alabi's professional background:\n\n📊 **Professional Summary**: Versatile IT Service Management & Technical Support professional with over 7 years of experience in comprehensive IT support, cybersecurity, and operational excellence.\n\n🏢 **Key Positions**:\n- **System Admin/Technical Support** at Sectronics (2022-2024)\n- **IT Consultant** at Alibra AI (2021)\n- **IT Service Desk Team Lead** at Nigerian Breweries (2019-2021)\n- **IT Help Desk Team Lead** at TotalEnergies (2017-2019)\n\n🎯 **Core Competencies**:\n${portfolioData.skills.slice(0, 5).join(' • ')} and more\n\n📧 Contact: ${portfolioData.email} | 📱 ${portfolioData.phone}`,
+      metadata: {
+        category: 'portfolio_overview',
+        fallback: true,
+        highlights: ['experience', 'background'],
+        timestamp: timestamp
+      }
+    };
+  }
+
+  if (lowerMessage.includes('skills') || lowerMessage.includes('expertise') || lowerMessage.includes('abilities')) {
+    return {
+      message: `🎯 **Oladayo Alabi's Key Technical Skills**:\n\n**Cloud & Identity Management:**\n• Microsoft Entra ID & Intune\n• Active Directory management\n\n**IT Operations:**\n• IT Service Management frameworks\n• Performance improvement strategies\n• SLA compliance monitoring\n\n**Security & Infrastructure:**\n• Cybersecurity implementations\n• Network administration\n• VPN configuration\n• Windows migration\n• ServiceNow ticketing systems\n\n**DevOps & Analytics:**\n• Process improvement methodologies\n• Predictive analytics using IBM Watson\n• SAP ERP systems\n\n🔧 Additionally certified in:\n${portfolioData.certifications.join(' • ')}\n\n💼 This skill set was developed through 7+ years working with leading organizations. Happy to discuss specific projects!`,
+      metadata: {
+        category: 'technical_skills',
+        fallback: true,
+        highlights: ['skills', 'expertise'],
+        timestamp: timestamp
+      }
+    };
+  }
+
+  if (lowerMessage.includes('contact') || lowerMessage.includes('reach') || lowerMessage.includes('hire') || lowerMessage.includes('phone') || lowerMessage.includes('email') || lowerMessage.includes('linkedin')) {
+    return {
+      message: `📬 **Getting in Touch with Oladayo Alabi**:\n\n💼 **Professional Contact**:\n• Email: ${portfolioData.email}\n• Phone: ${portfolioData.phone}\n• LinkedIn: ${portfolioData.linkedin}\n\n📍 **Location**: Philadelphia, Pennsylvania, United States\n\n🏆 **Professional Expertise**:\n• ${portfolioData.title}\n• 7+ years IT experience across 6 companies\n• Specializes in IT service management and cybersecurity\n\n🎯 Areas of specialization: ${portfolioData.skills.slice(0, 4).join(', ')}\n\nFeel free to reach out for professional opportunities in IT leadership, cybersecurity, or technical support roles!\n\n*Message via LinkedIn or email to connect.*`,
+      metadata: {
+        category: 'contact_info',
+        fallback: true,
+        highlights: ['contact', 'recruitment'],
+        timestamp: timestamp
+      }
+    };
+  }
+
+  if (lowerMessage.includes('projects') || lowerMessage.includes('work') || lowerMessage.includes('accomplishments')) {
+    return {
+      message: `🏆 **Highlighted Projects & Achievements**:\n\n**Recent Work (Sectronics, 2022-2024):**\n• Managed identity lifecycle management\n• Oversaw servicedesk and ticketing operations\n\n**Innovative Solutions (Alibra AI, 2021):**\n• Boosted security posture by 90%\n• Reduced phishing susceptibility by 85%\n• Implemented MFA for 2-location access\n\n**Leadership Achievements (Nigerian Breweries, 2019-2021):**\n• Reduced incident resolution times by 50%\n• Achieved 99% customer satisfaction rating\n• Managed 1,500+ device patch management\n\n**OCD Migration (TotalEnergies, 2017-2019):**\n• Led Office 365 migration for 800+ users\n• Managed Windows 7 → 10 migration for 1,500 PCs\n• Directed IT support for 7-person team\n\n💡 Oladayo continuously focuses on innovative solutions that deliver operational excellence and enhanced user experiences.`,
+      metadata: {
+        category: 'project_highlights',
+        fallback: true,
+        highlights: ['achievements', 'projects'],
+        timestamp: timestamp
+      }
+    };
+  }
+
+  if (lowerMessage.includes('education') || lowerMessage.includes('study') || lowerMessage.includes('degree') || lowerMessage.includes('college') || lowerMessage.includes('certifications')) {
+    return {
+      message: `🎓 **Educational Background & Certifications**:\n\n🏆 **Professional Certifications**:\n${portfolioData.certifications.map(cert => `• ${cert}`).join('\n')}\n\n💼 **Professional Development Focus Areas**:\n• Information Security and Risk Management (CISA)\n• SAP ERP Business Solutions\n• Big Data and Analytics (IBM)\n• IT Operations & Maintenance\n\n📈 **Knowledge Application**:\nThese certifications complement Oladayo's 7+ years of hands-on IT leadership experience, providing a strong foundation in both theoretical frameworks and practical implementation.\n\n*Combined with real-world experience across multinational corporations, these credentials demonstrate comprehensive IT expertise.*`,
+      metadata: {
+        category: 'education_certifications',
+        fallback: true,
+        highlights: ['certifications', 'learning'],
+        timestamp: timestamp
+      }
+    };
+  }
+
+  if (lowerMessage.includes('it') || lowerMessage.includes('technology') || lowerMessage.includes('cybersecurity') || lowerMessage.includes('security')) {
+    return {
+      message: `🛡️ **IT Service Management & Cybersecurity Expertise**:\n\n**Core IT Skills:**\n${portfolioData.skills.join(' • ')}\n\n**Key Achievements:**\n• Improved security postures by up to 90%\n• Reduced customer incident resolution times by 50%\n• Led large-scale Windows migrations (1,500+ PCs)\n• Implemented MFA and secure access systems\n• Managed enterprise-level patching\n\n**Leadership Experience:**\n• Supervised IT teams of 7+ professionals\n• Trained junior staff and interns\n• Directed operations for 800+ users\n• Maintained 99% customer satisfaction ratings\n\n💡 **Industry Knowledge**: Deep expertise in enterprise IT operations, cloud security, network administration, and service-level excellence.\n\nOladayo specializes in turning complex IT challenges into streamlined, secure operations.`,
+      metadata: {
+        category: 'technical_expertise',
+        fallback: true,
+        highlights: ['it_expertise', 'cybersecurity'],
+        timestamp: timestamp
+      }
+    };
+  }
+
+  // Default fallback response
+  return {
+    message: `Hello! I'm Oladayo's AI assistant. While our AI chatbot is currently experiencing a temporary service limitation, I'd be happy to connect you with Oladayo directly.
+
+${portfolioData.name} is a ${portfolioData.title} with over 7 years of experience in IT service management, cybersecurity, and technical support.
+
+**Key Areas of Expertise:**
+• IT Service Management & Technical Support
+• Cybersecurity & Network Administration
+• Microsoft Entra ID & Intune
+• Active Directory & VPN Configuration
+• Incident Management & SLA Compliance
+
+**Contact Information:**
+📧 Email: ${portfolioData.email}
+📱 Phone: ${portfolioData.phone}
+💼 LinkedIn: ${portfolioData.linkedin}
+
+Feel free to reach out for professional discussions, career opportunities, or to discuss IT leadership experiences! Oladayo would be pleased to connect with you.`,
+    metadata: {
+      category: 'general_introduction',
+      fallback: true,
+      helpful_info: true,
+      timestamp: timestamp
+    }
+  };
+}
+
 // AI Chat endpoint
 app.post('/api/chat', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { message, conversationHistory = [], category } = req.body as ChatRequest;
+    const { message, conversationHistory = [], category, model: requestModel } = req.body as ChatRequest & { model?: string };
 
     if (!message || message.trim().length === 0) {
       return res.status(400).json({ error: 'Message cannot be empty' });
@@ -186,8 +304,8 @@ app.post('/api/chat', async (req: Request, res: Response, next: NextFunction) =>
     ];
 
     // Use OpenRouter with fallback models for reliability
-    // Default: GPT-4 Turbo (most reliable), Fallback: GPT-3.5-turbo
-    const model = process.env.AI_MODEL || 'openai/gpt-4-turbo';
+    // Default: Use environment variable, or request-specific model
+    const model = requestModel || process.env.AI_MODEL || 'google/gemini-2.0-flash-exp:free';
     
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
@@ -217,12 +335,23 @@ app.post('/api/chat', async (req: Request, res: Response, next: NextFunction) =>
 
     const assistantMessage = response.data.choices[0].message.content;
 
+    const endTime = new Date();
+    const startTime = Date.now() - (response.data.usage.total_tokens / 10); // Estimate processing time
+
     res.json({
       success: true,
       message: assistantMessage,
+      source: 'OpenRouter AI',
+      model: response.data.model || model,
+      provider: response.data.provider || 'Unknown',
       metadata: {
         timestamp: new Date().toISOString(),
-        category: category || 'general',
+        category: category || 'portfolio',
+        runtime: {
+          generation_time: endTime.getTime() - startTime,
+          latency: response.data.usage.total_tokens / 10, // Estimated based on tokens
+          tokens_per_second: response.data.usage.total_tokens / ((endTime.getTime() - startTime) / 1000)
+        },
         tokens: {
           prompt: response.data.usage.prompt_tokens,
           completion: response.data.usage.completion_tokens,
@@ -235,20 +364,38 @@ app.post('/api/chat', async (req: Request, res: Response, next: NextFunction) =>
     
     // Handle specific error cases
     if (error.response?.status === 401) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
         error: 'Authentication failed',
         details: 'OPENROUTER_API_KEY is invalid or not configured. Please check your environment variables.',
         code: 'AUTH_ERROR'
       });
     }
-    
-    if (error.response?.status === 429) {
-      return res.status(429).json({ 
+
+    if (error.response?.status === 429 || error.response?.data?.error?.code === 429) {
+      return res.status(429).json({
         success: false,
         error: 'Rate limit exceeded',
-        details: 'Too many requests. Please wait a moment and try again.',
+        details: 'The AI service is temporarily rate-limited. Please wait 1-2 minutes and try again.',
         code: 'RATE_LIMIT'
+      });
+    }
+
+    if (error.response?.status === 402) {
+      const { message, category } = req.body as ChatRequest;
+
+      // Use smart fallback system to provide helpful responses even when API is unavailable
+      const smartResponse = generateSmartFallback(message, category || 'general');
+
+      return res.status(503).json({
+        success: false,
+        error: 'AI Service Temporarily Unavailable',
+        message: smartResponse.message,
+        details: 'The AI service requires credits to operate, but I can still provide valuable information about Oladayo!',
+        code: 'CREDITS_EXHAUSTED',
+        source: 'Smart Portfolio Assistant',
+        fallback: true,
+        metadata: smartResponse.metadata
       });
     }
 

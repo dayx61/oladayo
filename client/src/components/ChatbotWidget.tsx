@@ -43,7 +43,13 @@ export default function ChatbotWidget() {
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/chat', {
+      // Determine API URL based on environment
+      const apiUrl = process.env.REACT_APP_API_URL || 
+                     (typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+                       ? 'http://localhost:5001' 
+                       : 'https://oladayo-portfolio-server.vercel.app');
+      
+      const response = await axios.post(`${apiUrl}/api/chat`, {
         message: input,
         conversationHistory: messages.map(m => ({ role: m.role, content: m.content })),
         category: 'general'

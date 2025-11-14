@@ -1,7 +1,7 @@
 {
-  "name": "oladayo-portfolio",
+  "name": "professional-it-portfolio",
   "version": "1.0.0",
-  "description": "Oladayo Alabi - IT Professional Portfolio",
+  "description": "Professional IT Portfolio with AI Chatbot",
   "private": true,
   "workspaces": [
     "client",

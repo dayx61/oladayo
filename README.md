@@ -75,7 +75,7 @@ A cutting-edge, full-stack portfolio website showcasing modern web technologies 
 ### Backend (Nov 2025)
 - **Node.js 24.9** with latest LTS features
 - **Express 4.21** with modern middleware
-- **OpenRouter API** with GPT-4 integration
+- **OpenRouter API** with Google Gemini 2.0 integration
 - **Nodemailer 6.9** for email processing
 - **TypeScript 5.6** for full-stack type safety
 

@@ -6,22 +6,38 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp?: string;
+  source?: string;
+  model?: string;
+  provider?: string;
+  metadata?: {
+    category?: string;
+    runtime?: {
+      generation_time?: number;
+      latency?: number;
+      tokens_per_second?: number;
+    };
+    tokens?: {
+      prompt?: number;
+      completion?: number;
+      total?: number;
+    };
+  };
 }
 
 const SUGGESTED_QUESTIONS = [
-  'Tell me about Oladayo\'s IT experience',
-  'What are Oladayo\'s key skills?',
+  'Tell me about the developer\'s IT experience',
+  'What are the key skills and expertise?',
   'Who is the CEO of Amazon?',
   'Explain IT Service Management',
-  'What certifications does Oladayo have?',
-  'How can I contact Oladayo?'
+  'What certifications are highlighted?',
+  'How can I get in touch?'
 ];
 
 export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: '✨ Welcome! I\'m Oladayo\'s AI Assistant powered by Claude 3.5. I can answer questions about his IT expertise, experience, skills, and more. What would you like to know?',
+      content: '✨ Welcome! I\'m the AI Portfolio Assistant. I can answer questions about the developer\'s IT expertise, experience, skills, and more. What would you like to know?',
       timestamp: new Date().toISOString()
     }
   ]);
@@ -53,7 +69,13 @@ export default function Chat() {
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/chat', {
+      // Determine API URL based on environment
+      const apiUrl = process.env.REACT_APP_API_URL || 
+                     (typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+                       ? 'http://localhost:5001' 
+                       : 'https://oladayo-portfolio-server.vercel.app');
+      
+      const response = await axios.post(`${apiUrl}/api/chat`, {
         message: textToSend,
         conversationHistory: messages.map(m => ({ role: m.role, content: m.content })),
         category: 'general'
@@ -61,29 +83,77 @@ export default function Chat() {
         timeout: 30000
       });
 
-      const assistantMessage: Message = {
-        role: 'assistant',
-        content: response.data.message,
-        timestamp: new Date().toISOString()
-      };
-      setMessages(prev => [...prev, assistantMessage]);
+      // Handle both successful AI responses and smart fallback responses
+      if (response.data.fallback) {
+        // Smart fallback response - treat as normal success
+        const fallbackMessage: Message = {
+          role: 'assistant',
+          content: response.data.message,
+          timestamp: new Date().toISOString(),
+          source: response.data.source || 'Smart Portfolio Assistant',
+          model: response.data.source || 'Smart Portfolio Assistant',
+          provider: 'Portfolio Intelligence',
+          metadata: response.data.metadata
+        };
+        setMessages(prev => [...prev, fallbackMessage]);
+      } else {
+        // Normal AI response
+        const assistantMessage: Message = {
+          role: 'assistant',
+          content: response.data.message,
+          timestamp: new Date().toISOString(),
+          source: response.data.source,
+          model: response.data.model,
+          provider: response.data.provider,
+          metadata: response.data.metadata
+        };
+        setMessages(prev => [...prev, assistantMessage]);
+      }
     } catch (error: any) {
       console.error('Chat error:', error);
-      
+      console.error('Error response data:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+
       let errorContent = 'Sorry, I encountered an error. Please try again later.';
-      
-      if (error.response?.data?.details) {
+
+      // Check for server error responses with specific codes
+      if (error.response?.data?.message && error.response?.data?.code) {
+        // Handle credits exhausted with portfolio fallback
+        if (error.response.data.code === 'CREDITS_EXHAUSTED') {
+          errorContent = error.response.data.message;
+        }
+        // Handle rate limiting
+        else if (error.response.data.code === 'RATE_LIMIT') {
+          errorContent = error.response.data.details || error.response.data.error;
+        }
+        // Handle auth errors
+        else if (error.response.data.code === 'AUTH_ERROR') {
+          errorContent = error.response.data.details || 'Authentication failed. Please check API configuration.';
+        }
+        // Handle other backend errors
+        else {
+          errorContent = error.response.data.message || error.response.data.error;
+        }
+      }
+      // Fallback to original error handling
+      else if (error.response?.data?.details) {
         errorContent = error.response.data.details;
+      } else if (error.response?.data?.message) {
+        errorContent = error.response.data.message;
       } else if (error.response?.status === 401) {
         errorContent = 'Authentication failed. Please check the API configuration.';
       } else if (error.response?.status === 429) {
-        errorContent = 'Rate limited. Please wait a moment and try again.';
+        errorContent = 'Rate limited. Please wait 1-2 minutes and try again.';
+      } else if (error.response?.data?.error && error.response?.status === 503) {
+        errorContent = error.response.data.error; // Credits exhausted fallback
       } else if (error.code === 'ECONNABORTED') {
         errorContent = 'Request timeout. The AI service took too long to respond.';
       } else if (error.message === 'Network Error') {
         errorContent = 'Network error. Please check your connection.';
+      } else if (error.response?.status === 500) {
+        errorContent = 'Internal server error. Please try again later.';
       }
-      
+
       const errorMessage: Message = {
         role: 'assistant',
         content: `⚠️ ${errorContent}`,
@@ -105,7 +175,7 @@ export default function Chat() {
     setMessages([
       {
         role: 'assistant',
-        content: '✨ Welcome! I\'m Oladayo\'s AI Assistant. What would you like to know?',
+        content: '✨ Welcome! I\'m the AI Portfolio Assistant. What would you like to know?',
         timestamp: new Date().toISOString()
       }
     ]);
@@ -154,14 +224,50 @@ export default function Chat() {
                 } px-6 py-4 rounded-2xl shadow-lg`}
               >
                 <p className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+
+                {/* Enhanced Metadata Display for Assistant Messages */}
                 {msg.role === 'assistant' && (
-                  <button
-                    onClick={() => copyToClipboard(msg.content, idx)}
-                    className="mt-3 text-xs opacity-60 hover:opacity-100 transition-opacity flex items-center gap-1"
-                  >
-                    <Copy size={14} />
-                    {copiedIdx === idx ? 'Copied!' : 'Copy'}
-                  </button>
+                  <div className="mt-3 pt-3 border-t border-gray-600/30">
+                    <div className="flex flex-wrap items-center gap-4 text-xs opacity-60">
+                      {msg.source && (
+                        <span className="flex items-center gap-1">
+                          📡 {msg.source}
+                        </span>
+                      )}
+                      {msg.provider && (
+                        <span className="flex items-center gap-1">
+                          🌐 {msg.provider}
+                        </span>
+                      )}
+                      {msg.model && (
+                        <span className="flex items-center gap-1">
+                          🤖 ${msg.model}
+                        </span>
+                      )}
+                      {msg.metadata?.runtime?.generation_time && (
+                        <span className="flex items-center gap-1">
+                          ⚡ ${Math.round(msg.metadata.runtime.generation_time / 1000 * 10) / 10}s
+                        </span>
+                      )}
+                      {msg.metadata?.tokens?.total && (
+                        <span className="flex items-center gap-1">
+                          📊 ${msg.metadata.tokens.total} tokens
+                        </span>
+                      )}
+                      {msg.metadata?.category && (
+                        <span className="flex items-center gap-1">
+                          🏷️ ${msg.metadata.category}
+                        </span>
+                      )}
+                      <button
+                        onClick={() => copyToClipboard(msg.content, idx)}
+                        className="hover:opacity-100 transition-opacity flex items-center gap-1 ml-auto"
+                      >
+                        <Copy size={14} />
+                        {copiedIdx === idx ? 'Copied!' : 'Copy'}
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
@@ -205,7 +311,7 @@ export default function Chat() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask anything about Oladayo or any topic..."
+              placeholder="Ask anything about the developer or any topic..."
               disabled={loading}
               className="flex-1 bg-premium-slate/60 border border-premium-accent/30 rounded-xl px-5 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-premium-accent focus:ring-2 focus:ring-premium-accent/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             />

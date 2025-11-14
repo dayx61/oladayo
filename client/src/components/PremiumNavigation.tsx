@@ -27,9 +27,8 @@ export default function PremiumNavigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group flex-shrink-0">
-            <img src="/logo.png" alt="Oladayo Logo" className="w-10 h-10 rounded-lg group-hover:shadow-lg group-hover:shadow-premium-accent/50 transition-all" />
-            <span className="font-bold text-lg light:text-light-text dark:text-dark-text hidden sm:inline">Oladayo</span>
+          <Link to="/" className="flex items-center group flex-shrink-0">
+            <img src="/logo.png" alt="Portfolio Logo" className="w-10 h-10 rounded-lg group-hover:shadow-lg group-hover:shadow-premium-accent/50 transition-all" />
           </Link>
 
           {/* Desktop Navigation */}
