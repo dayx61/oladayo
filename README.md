@@ -107,8 +107,7 @@ oladayo-portfolio/
 │   │   └── index.ts           # Main server & API routes
 │   ├── dist/                  # Compiled JavaScript
 │   ├── package.json           # Backend dependencies
-│   ├── tsconfig.json          # TypeScript config
-│   └── .env.example           # Environment template
+│   └── tsconfig.json          # TypeScript config
 ├── .stylelintrc.json         # CSS linting rules
 ├── package.json              # Monorepo workspace config
 ├── vercel.json               # Vercel deployment config
@@ -131,13 +130,13 @@ cd oladayo-portfolio
 # Install all dependencies (monorepo)
 npm install
 
-# Copy environment template
-cp server/.env.example server/.env
+# Create environment file and add required variables:
+touch server/.env
 
-# Edit server/.env with your API keys:
-# OPENROUTER_API_KEY=your_key_here
+# Required environment variables:
+# OPENROUTER_API_KEY=your_openrouter_api_key_here
 # EMAIL_USER=your_email@gmail.com
-# EMAIL_PASSWORD=your_app_password
+# EMAIL_PASSWORD=your_app_password_here
 ```
 
 ### Development
