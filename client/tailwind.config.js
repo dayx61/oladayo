@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -7,6 +8,20 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Light mode colors
+        'light-bg': '#ffffff',
+        'light-bg-secondary': '#f8f9fa',
+        'light-text': '#1a1a1a',
+        'light-text-secondary': '#666666',
+        'light-border': '#e0e0e0',
+        
+        // Dark mode colors
+        'dark-bg': '#050810',
+        'dark-bg-secondary': '#0a0e27',
+        'dark-text': '#ffffff',
+        'dark-text-secondary': '#b0b0b0',
+        'dark-border': '#1e293b',
+        
         // Premium color palette inspired by top tech companies
         'premium-dark': '#0a0e27',
         'premium-darker': '#050810',

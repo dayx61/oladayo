@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
 export default function PremiumNavigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,18 +11,25 @@ export default function PremiumNavigation() {
     { name: 'About', path: '/about' },
     { name: 'Experience', path: '/experience' },
     { name: 'Skills', path: '/skills' },
+    { name: 'Projects', path: '/projects' },
+    { name: 'Blog', path: '/blog' },
+    { name: 'Testimonials', path: '/testimonials' },
+    { name: 'Resources', path: '/resources' },
     { name: 'Analytics', path: '/analytics' },
     { name: 'Contact', path: '/contact' }
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-premium-darker/80 backdrop-blur-xl border-b border-premium-accent/10">
+    <nav className="fixed top-0 left-0 right-0 z-50 transition-colors duration-300
+      light:bg-light-bg/80 light:border-b light:border-light-border
+      dark:bg-dark-bg/80 dark:border-b dark:border-dark-border
+      backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <img src="/logo.png" alt="Oladayo Logo" className="w-10 h-10 rounded-lg group-hover:shadow-lg group-hover:shadow-premium-accent/50 transition-all" />
-            <span className="font-bold text-lg text-white hidden sm:inline">Oladayo</span>
+            <span className="font-bold text-lg light:text-light-text dark:text-dark-text hidden sm:inline">Oladayo</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -30,48 +38,48 @@ export default function PremiumNavigation() {
               <Link
                 key={link.path}
                 to={link.path}
-                className="px-4 py-2 rounded-lg text-gray-300 hover:text-premium-accent hover:bg-premium-accent/10 transition-all duration-300 font-medium"
+                className="px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300
+                  light:text-light-text-secondary light:hover:text-light-text light:hover:bg-light-bg-secondary
+                  dark:text-dark-text-secondary dark:hover:text-dark-text dark:hover:bg-dark-bg-secondary"
               >
                 {link.name}
               </Link>
             ))}
           </div>
 
+          {/* Right Section */}
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
 
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-premium-accent/10 transition-colors"
-          >
-            {isOpen ? (
-              <X size={24} className="text-premium-accent" />
-            ) : (
-              <Menu size={24} className="text-premium-accent" />
-            )}
-          </button>
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="md:hidden p-2 rounded-lg light:hover:bg-light-border dark:hover:bg-dark-border transition-colors"
+            >
+              {isOpen ? (
+                <X size={24} className="light:text-light-text dark:text-premium-accent" />
+              ) : (
+                <Menu size={24} className="light:text-light-text dark:text-premium-accent" />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden pb-4 border-t border-premium-accent/10 animate-slideUp">
+          <div className="md:hidden pb-4 border-t light:border-light-border dark:border-dark-border animate-slideUp">
             {links.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 onClick={() => setIsOpen(false)}
-                className="block px-4 py-3 text-gray-300 hover:text-premium-accent hover:bg-premium-accent/10 transition-all duration-300 font-medium"
+                className="block px-4 py-3 transition-all duration-300 font-medium
+                  light:text-light-text-secondary light:hover:text-light-text light:hover:bg-light-bg-secondary
+                  dark:text-dark-text-secondary dark:hover:text-dark-text dark:hover:bg-dark-bg-secondary"
               >
                 {link.name}
               </Link>
             ))}
-            <Link
-              to="/contact"
-              onClick={() => setIsOpen(false)}
-              className="block mx-4 mt-4 px-4 py-2 bg-gradient-to-r from-premium-accent to-premium-blue rounded-lg font-semibold text-premium-darker text-center hover:shadow-lg hover:shadow-premium-accent/50 transition-all"
-            >
-              Connect
-            </Link>
           </div>
         )}
       </div>
