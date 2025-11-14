@@ -37,13 +37,7 @@ export default function PremiumNavigation() {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <Link
-            to="/contact"
-            className="hidden md:inline-flex px-6 py-2 bg-gradient-to-r from-premium-accent to-premium-blue rounded-lg font-semibold text-premium-darker hover:shadow-lg hover:shadow-premium-accent/50 transition-all duration-300 transform hover:scale-105"
-          >
-            Connect
-          </Link>
+
 
           {/* Mobile Menu Button */}
           <button
