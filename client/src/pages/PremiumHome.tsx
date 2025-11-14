@@ -1,4 +1,4 @@
-import { ArrowRight, Zap, Code, Brain, Target, Users, TrendingUp } from 'lucide-react';
+import { ArrowRight, Zap, Code, Target, Users, TrendingUp, Shield, Rocket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function PremiumHome() {
@@ -103,43 +103,61 @@ export default function PremiumHome() {
               {
                 icon: <Code size={32} />,
                 title: 'IT Service Management',
-                description: 'ITIL-certified expertise in service delivery and operations'
+                description: 'ITIL-certified expertise in service delivery and operations',
+                color: 'from-blue-500 to-cyan-500',
+                iconColor: 'text-blue-400'
               },
               {
-                icon: <Brain size={32} />,
+                icon: <Shield size={32} />,
                 title: 'Cybersecurity',
-                description: 'Security operations and compliance management'
+                description: 'Security operations and compliance management',
+                color: 'from-red-500 to-pink-500',
+                iconColor: 'text-red-400'
               },
               {
                 icon: <Users size={32} />,
                 title: 'Team Leadership',
-                description: 'Building and mentoring high-performing teams'
+                description: 'Building and mentoring high-performing teams',
+                color: 'from-purple-500 to-pink-500',
+                iconColor: 'text-purple-400'
               },
               {
                 icon: <Target size={32} />,
                 title: 'System Administration',
-                description: 'Infrastructure and systems management expertise'
+                description: 'Infrastructure and systems management expertise',
+                color: 'from-green-500 to-emerald-500',
+                iconColor: 'text-green-400'
               },
               {
                 icon: <TrendingUp size={32} />,
                 title: 'Strategic Planning',
-                description: 'Digital transformation and business alignment'
+                description: 'Digital transformation and business alignment',
+                color: 'from-yellow-500 to-orange-500',
+                iconColor: 'text-yellow-400'
               },
               {
-                icon: <Zap size={32} />,
+                icon: <Rocket size={32} />,
                 title: 'Technical Support',
-                description: '800+ users supported with 96% satisfaction'
+                description: '800+ users supported with 96% satisfaction',
+                color: 'from-indigo-500 to-blue-500',
+                iconColor: 'text-indigo-400'
               }
             ].map((feature, idx) => (
               <div
                 key={idx}
-                className="group relative p-6 rounded-xl border border-premium-accent/20 bg-gradient-to-br from-premium-slate/50 to-premium-darker hover:border-premium-accent/50 transition-all duration-300 hover:bg-gradient-to-br hover:from-premium-accent/10 hover:to-premium-purple/10"
+                className="group relative p-6 rounded-xl border border-premium-accent/20 bg-gradient-to-br from-premium-slate/50 to-premium-darker hover:border-premium-accent/50 transition-all duration-300 hover:shadow-lg hover:shadow-premium-accent/20 overflow-hidden"
               >
-                <div className="text-premium-accent mb-4 group-hover:text-premium-accent-2 transition-colors">
-                  {feature.icon}
+                {/* Gradient background on hover */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
+                
+                {/* Content */}
+                <div className="relative z-10">
+                  <div className={`${feature.iconColor} mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2 group-hover:text-premium-accent transition-colors">{feature.title}</h3>
+                  <p className="text-gray-400 text-sm group-hover:text-gray-300 transition-colors">{feature.description}</p>
                 </div>
-                <h3 className="text-lg font-bold text-white mb-2">{feature.title}</h3>
-                <p className="text-gray-400 text-sm">{feature.description}</p>
               </div>
             ))}
           </div>

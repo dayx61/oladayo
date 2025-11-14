@@ -11,14 +11,14 @@ export default function ThemeToggle() {
         light:bg-light-bg-secondary light:text-light-text light:hover:bg-light-border light:hover:text-premium-accent
         dark:bg-dark-bg-secondary dark:text-dark-text dark:hover:bg-dark-bg-secondary dark:hover:text-premium-accent
         light:border light:border-light-border dark:border dark:border-dark-border
-        hover:shadow-md"
+        hover:shadow-md hover:shadow-premium-accent/50 animate-rainbow-border group"
       aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
       title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
     >
       {theme === 'light' ? (
-        <Moon size={18} className="transition-transform duration-300 hover:scale-110" />
+        <Moon size={18} className="transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12" />
       ) : (
-        <Sun size={18} className="transition-transform duration-300 hover:scale-110" />
+        <Sun size={18} className="transition-transform duration-300 group-hover:scale-125 group-hover:rotate-45" />
       )}
     </button>
   );

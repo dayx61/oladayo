@@ -69,13 +69,13 @@ export default function ChatbotWidget() {
           setIsOpen(!isOpen);
           setIsMinimized(false);
         }}
-        className={`fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-br from-premium-accent to-premium-blue shadow-lg hover:shadow-xl hover:shadow-premium-accent/50 transition-all duration-300 flex items-center justify-center group ${
+        className={`fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-br from-premium-accent via-premium-purple to-premium-blue shadow-lg transition-all duration-300 flex items-center justify-center group animate-rainbow-glow ${
           isOpen ? 'scale-0' : 'scale-100'
         }`}
       >
-        <MessageCircle size={24} className="text-premium-darker group-hover:scale-110 transition-transform" />
-        <div className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-premium-darker text-premium-accent text-xs font-semibold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-          Chat with AI
+        <MessageCircle size={24} className="text-premium-darker group-hover:scale-125 transition-transform duration-300" />
+        <div className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-premium-darker text-premium-accent text-xs font-semibold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-premium-accent/50">
+          💬 Chat with AI
         </div>
       </button>
 
@@ -152,9 +152,9 @@ export default function ChatbotWidget() {
                 <button
                   type="submit"
                   disabled={loading || !input.trim()}
-                  className="p-2 bg-gradient-to-r from-premium-accent to-premium-blue rounded-lg text-premium-darker hover:shadow-lg hover:shadow-premium-accent/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-2 bg-gradient-to-r from-premium-accent via-premium-purple to-premium-blue rounded-lg text-premium-darker hover:shadow-lg hover:shadow-premium-accent/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-110 duration-300 animate-rainbow-border"
                 >
-                  <Send size={18} />
+                  <Send size={18} className="hover:rotate-45 transition-transform duration-300" />
                 </button>
               </form>
             </div>
