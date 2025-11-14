@@ -1,35 +1,31 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navigation from './components/Navigation';
+import PremiumNavigation from './components/PremiumNavigation';
 import Footer from './components/Footer';
-import Home from './pages/Home';
+import ChatbotWidget from './components/ChatbotWidget';
+import PremiumHome from './pages/PremiumHome';
 import About from './pages/About';
 import Experience from './pages/Experience';
 import Skills from './pages/Skills';
 import Analytics from './pages/Analytics';
-import Chat from './pages/Chat';
 import Contact from './pages/Contact';
 import './App.css';
 
-function App() {
+export default function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white flex flex-col">
-        <Navigation />
-        <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/experience" element={<Experience />} />
-            <Route path="/skills" element={<Skills />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/contact" element={<Contact />} />
-          </Routes>
-        </main>
+      <div className="min-h-screen bg-premium-darker text-white">
+        <PremiumNavigation />
+        <Routes>
+          <Route path="/" element={<PremiumHome />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/experience" element={<Experience />} />
+          <Route path="/skills" element={<Skills />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/contact" element={<Contact />} />
+        </Routes>
         <Footer />
+        <ChatbotWidget />
       </div>
     </Router>
   );
 }
-
-export default App;
