@@ -47,11 +47,24 @@ export default function Chat() {
         content: response.data.message
       };
       setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error('Chat error:', error);
+    } catch (error: any) {
+      console.error('Chat error:', error.response?.data || error.message);
+      
+      let errorContent = 'Sorry, I encountered an error. Please try again later.';
+      
+      if (error.response?.data?.details) {
+        errorContent = `Error: ${error.response.data.details}`;
+      } else if (error.response?.status === 401) {
+        errorContent = 'Authentication failed. Please check the API configuration.';
+      } else if (error.response?.status === 429) {
+        errorContent = 'Rate limited. Please wait a moment and try again.';
+      } else if (error.message === 'Network Error') {
+        errorContent = 'Network error. Please check your connection and ensure the backend is running.';
+      }
+      
       const errorMessage: Message = {
         role: 'assistant',
-        content: 'Sorry, I encountered an error. Please try again later.'
+        content: errorContent
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {

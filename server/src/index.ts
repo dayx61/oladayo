@@ -222,9 +222,26 @@ app.post('/api/chat', async (req: Request, res: Response, next: NextFunction) =>
         }
       }
     });
-  } catch (error) {
-    console.error('Chat error:', error);
-    next(error);
+  } catch (error: any) {
+    console.error('Chat error:', error.response?.data || error.message);
+    
+    if (error.response?.status === 401) {
+      return res.status(401).json({ 
+        error: 'Authentication failed. API key may be invalid.',
+        details: 'OPENROUTER_API_KEY is not properly configured'
+      });
+    }
+    
+    if (error.response?.status === 429) {
+      return res.status(429).json({ 
+        error: 'Rate limited. Please try again later.' 
+      });
+    }
+    
+    res.status(500).json({ 
+      error: 'Failed to get AI response',
+      details: error.message 
+    });
   }
 });
 
