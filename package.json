@@ -3,14 +3,20 @@
   "version": "1.0.0",
   "description": "Oladayo Alabi - IT Professional Portfolio",
   "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
-    "dev:client": "cd client && npm run dev",
-    "dev:server": "cd server && npm run dev",
-    "build": "npx vite build --config client/vite.config.ts --outDir dist && npm run build:server",
-    "build:server": "cd server && npm run build",
+    "dev:client": "npm run dev --workspace=client",
+    "dev:server": "npm run dev --workspace=server",
+    "build": "npm run build --workspace=server && npx vite build --config client/vite.config.ts --outDir dist",
+    "build:server": "npm run build --workspace=server",
+    "build:client": "npx vite build --config client/vite.config.ts --outDir dist",
     "start": "node server/dist/index.js",
-    "deploy": "vercel"
+    "deploy": "vercel",
+    "install:all": "npm install"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

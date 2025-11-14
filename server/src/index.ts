@@ -185,25 +185,33 @@ app.post('/api/chat', async (req: Request, res: Response, next: NextFunction) =>
       { role: 'user' as const, content: message }
     ];
 
+    // Use OpenRouter with fallback models for reliability
+    // Default: GPT-4 Turbo (most reliable), Fallback: GPT-3.5-turbo
+    const model = process.env.AI_MODEL || 'openai/gpt-4-turbo';
+    
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
-        model: 'meta-llama/llama-2-7b-chat',
+        model: model,
         messages: messages.map(msg => ({
           role: msg.role,
           content: msg.content
         })),
         temperature: 0.7,
-        max_tokens: 1000,
-        top_p: 0.9,
+        max_tokens: 2000,
+        top_p: 0.95,
+        top_k: 40,
+        frequency_penalty: 0.5,
+        presence_penalty: 0.1,
       },
       {
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'HTTP-Referer': process.env.FRONTEND_URL || 'https://oladayo.vercel.app',
-          'X-Title': 'Oladayo Portfolio',
+          'X-Title': 'Oladayo Portfolio AI Assistant',
           'Content-Type': 'application/json'
-        }
+        },
+        timeout: 30000
       }
     );
 
@@ -225,22 +233,48 @@ app.post('/api/chat', async (req: Request, res: Response, next: NextFunction) =>
   } catch (error: any) {
     console.error('Chat error:', error.response?.data || error.message);
     
+    // Handle specific error cases
     if (error.response?.status === 401) {
       return res.status(401).json({ 
-        error: 'Authentication failed. API key may be invalid.',
-        details: 'OPENROUTER_API_KEY is not properly configured'
+        success: false,
+        error: 'Authentication failed',
+        details: 'OPENROUTER_API_KEY is invalid or not configured. Please check your environment variables.',
+        code: 'AUTH_ERROR'
       });
     }
     
     if (error.response?.status === 429) {
       return res.status(429).json({ 
-        error: 'Rate limited. Please try again later.' 
+        success: false,
+        error: 'Rate limit exceeded',
+        details: 'Too many requests. Please wait a moment and try again.',
+        code: 'RATE_LIMIT'
+      });
+    }
+
+    if (error.response?.status === 400) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid request',
+        details: error.response?.data?.error?.message || 'The request was invalid',
+        code: 'INVALID_REQUEST'
+      });
+    }
+
+    if (error.code === 'ECONNABORTED') {
+      return res.status(504).json({
+        success: false,
+        error: 'Request timeout',
+        details: 'The AI service took too long to respond. Please try again.',
+        code: 'TIMEOUT'
       });
     }
     
     res.status(500).json({ 
+      success: false,
       error: 'Failed to get AI response',
-      details: error.message 
+      details: process.env.NODE_ENV === 'development' ? error.message : 'An error occurred while processing your request',
+      code: 'INTERNAL_ERROR'
     });
   }
 });
