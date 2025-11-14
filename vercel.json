@@ -1,12 +1,6 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "client/dist",
-  "env": {
-    "OPENROUTER_API_KEY": "@openrouter_api_key",
-    "FRONTEND_URL": "https://oladayo.vercel.app",
-    "EMAIL_USER": "@email_user",
-    "EMAIL_PASSWORD": "@email_password"
-  },
   "functions": {
     "server/dist/index.js": {
       "memory": 1024,
