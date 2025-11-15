@@ -18,7 +18,7 @@ export default function About() {
           <div className="light:bg-light-bg-secondary light:border light:border-light-border dark:bg-dark-bg-secondary dark:border dark:border-dark-border rounded-xl p-8 transition-all duration-300">
             <Mail className="text-premium-accent mb-4" size={32} />
             <h3 className="text-xl font-bold mb-2 light:text-light-text dark:text-dark-text">Email</h3>
-            <p className="light:text-light-text-secondary dark:text-dark-text-secondary">alabioladayoibrahim@hotmail.com</p>
+            <p className="light:text-light-text-secondary dark:text-dark-text-secondary">dayx61@gmail.com</p>
           </div>
           <div className="light:bg-light-bg-secondary light:border light:border-light-border dark:bg-dark-bg-secondary dark:border dark:border-dark-border rounded-xl p-8 transition-all duration-300">
             <Phone className="text-premium-accent mb-4" size={32} />
@@ -94,7 +94,7 @@ export default function About() {
               <Linkedin size={20} /> LinkedIn Profile
             </a>
             <a
-              href="mailto:alabioladayoibrahim@hotmail.com"
+              href="mailto:dayx61@gmail.com"
               className="flex items-center gap-2 px-6 py-3 light:border light:border-light-border light:text-light-text light:hover:bg-light-bg-secondary dark:border dark:border-dark-border dark:text-dark-text dark:hover:bg-dark-bg-secondary rounded-lg transition-all duration-300 font-semibold"
             >
               <Mail size={20} /> Send Email

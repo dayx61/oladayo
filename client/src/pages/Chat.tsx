@@ -39,7 +39,7 @@ const PORTFOLIO_FALLBACK = `Oladayo is an IT leader with 7+ years across six org
 - Impact: 96% user satisfaction, 0 major incidents in 18 months, 45% faster ticket-to-fix via automation
 - Platforms: cloud + on-prem modernization, ITSM, and enterprise support for 800+ users
 - Leadership: builds and mentors teams, aligns IT KPIs to business outcomes
-- Contact: alabioladayoibrahim@hotmail.com • +1 267-957-4048 • LinkedIn: /in/olaalabi53`;
+- Contact: dayx61@gmail.com • +1 267-957-4048 • LinkedIn: /in/olaalabi53`;
 
 export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([

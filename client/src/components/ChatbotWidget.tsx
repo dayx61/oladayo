@@ -9,7 +9,7 @@ interface Message {
   source?: string;
 }
 
-const OFFLINE_FALLBACK = `Oladayo Alabi is an IT leader with 7+ years across six organizations, specializing in Microsoft Entra ID/Intune, cybersecurity, and IT service management. He delivers enterprise support for 800+ users with a 96% satisfaction rate and leads initiatives such as zero-trust security and large-scale Windows migrations. Connect via LinkedIn (linkedin.com/in/olaalabi53) or email alabioladayoibrahim@hotmail.com for professional inquiries.`;
+const OFFLINE_FALLBACK = `Oladayo Alabi is an IT leader with 7+ years across six organizations, specializing in Microsoft Entra ID/Intune, cybersecurity, and IT service management. He delivers enterprise support for 800+ users with a 96% satisfaction rate and leads initiatives such as zero-trust security and large-scale Windows migrations. Connect via LinkedIn (linkedin.com/in/olaalabi53) or email dayx61@gmail.com for professional inquiries.`;
 
 type HealthResult =
   | { status: 'online'; info?: { timestamp?: string } }

@@ -3,7 +3,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import axios from 'axios';
 import nodemailer from 'nodemailer';
+import { neon } from '@neondatabase/serverless';
 dotenv.config();
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:3000',
@@ -11,11 +13,17 @@ const allowedOrigins = [
     process.env.FRONTEND_URL || ''
 ].filter(Boolean);
 const isLocalhostOrigin = (origin) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin);
+const CONTACT_FORWARD_EMAIL = process.env.CONTACT_FORWARD_EMAIL || 'dayx61@gmail.com';
+const databaseUrl = process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.POSTGRES_PRISMA_URL;
+const sql = databaseUrl ? neon(databaseUrl) : null;
+let tablesInitialized = false;
 const portfolioData = {
     name: 'Oladayo Alabi',
     title: 'IT Service Management & Technical Support | Information Technology Security Operations',
     location: 'Philadelphia, Pennsylvania, United States',
-    email: 'alabioladayoibrahim@hotmail.com',
+    email: 'dayx61@gmail.com',
     phone: '+1 267-957-4048',
     linkedin: 'https://www.linkedin.com/in/olaalabi53',
     summary: `As a versatile IT professional with over 7 years of experience in technical support, IT service management, and cybersecurity, I thrive on driving operational excellence, enhancing security frameworks, and delivering seamless user experiences.`,
@@ -89,6 +97,51 @@ const portfolioData = {
         }
     ]
 };
+async function ensureTables() {
+    if (!sql || tablesInitialized)
+        return;
+    await sql `CREATE TABLE IF NOT EXISTS contact_messages (
+    id BIGSERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  );`;
+    await sql `CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+    id BIGSERIAL PRIMARY KEY,
+    email TEXT NOT NULL UNIQUE,
+    source TEXT,
+    subscribed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  );`;
+    tablesInitialized = true;
+}
+async function saveContactSubmission(entry) {
+    if (!sql) {
+        throw new Error('Database not configured for contact submissions');
+    }
+    try {
+        await ensureTables();
+        await sql `INSERT INTO contact_messages (name, email, subject, message)
+              VALUES (${entry.name}, ${entry.email}, ${entry.subject}, ${entry.message});`;
+    }
+    catch (error) {
+        console.error('Failed to store contact submission:', error);
+    }
+}
+async function saveSubscriber(email, source) {
+    if (!sql) {
+        throw new Error('Database not configured for newsletter subscriptions');
+    }
+    await ensureTables();
+    await sql `
+    INSERT INTO newsletter_subscribers (email, source)
+    VALUES (${email}, ${source || 'newsletter'})
+    ON CONFLICT (email) DO UPDATE
+    SET source = EXCLUDED.source,
+        subscribed_at = NOW();
+  `;
+}
 function isGreeting(message) {
     const trimmed = message.trim().toLowerCase();
     return ['hi', 'hello', 'hey', 'yo', 'hola', 'howdy'].includes(trimmed) || /^hi[\s!.,]*$/i.test(message) || /^hello[\s!.,]*$/i.test(message);
@@ -308,37 +361,71 @@ export function createApp() {
             data: portfolioData
         });
     });
+    app.post('/api/newsletter', async (req, res) => {
+        try {
+            const { email, source } = req.body;
+            const trimmedEmail = email?.toString().trim().toLowerCase() || '';
+            if (!trimmedEmail || !emailRegex.test(trimmedEmail)) {
+                return res.status(400).json({ error: 'Valid email is required' });
+            }
+            await saveSubscriber(trimmedEmail, source || 'newsletter');
+            return res.json({
+                success: true,
+                message: 'Subscribed successfully'
+            });
+        }
+        catch (error) {
+            console.error('Newsletter error:', error);
+            return res.status(500).json({ error: 'Failed to save subscription. Please try again.' });
+        }
+    });
     app.post('/api/contact', async (req, res, next) => {
         try {
             const { name, email, subject, message } = req.body;
             if (!name || !email || !subject || !message) {
                 return res.status(400).json({ error: 'All fields are required' });
             }
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 return res.status(400).json({ error: 'Invalid email address' });
             }
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASSWORD
+            const payload = {
+                name: name.toString().trim(),
+                email: email.toString().trim(),
+                subject: subject.toString().trim(),
+                message: message.toString().trim()
+            };
+            await saveContactSubmission(payload);
+            if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
+                try {
+                    const transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                            user: process.env.EMAIL_USER,
+                            pass: process.env.EMAIL_PASSWORD
+                        }
+                    });
+                    await transporter.sendMail({
+                        from: process.env.EMAIL_USER,
+                        to: CONTACT_FORWARD_EMAIL,
+                        replyTo: payload.email,
+                        subject: `Portfolio Contact: ${payload.subject}`,
+                        html: `
+              <h2>New Contact Form Submission</h2>
+              <p><strong>Name:</strong> ${payload.name}</p>
+              <p><strong>Email:</strong> ${payload.email}</p>
+              <p><strong>Subject:</strong> ${payload.subject}</p>
+              <p><strong>Message:</strong></p>
+              <p>${payload.message.replace(/\n/g, '<br>')}</p>
+            `
+                    });
                 }
-            });
-            await transporter.sendMail({
-                from: process.env.EMAIL_USER,
-                to: portfolioData.email,
-                replyTo: email,
-                subject: `Portfolio Contact: ${subject}`,
-                html: `
-          <h2>New Contact Form Submission</h2>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Subject:</strong> ${subject}</p>
-          <p><strong>Message:</strong></p>
-          <p>${message.replace(/\n/g, '<br>')}</p>
-        `
-            });
+                catch (mailError) {
+                    console.error('Email notification failed:', mailError);
+                }
+            }
+            else {
+                console.warn('EMAIL_USER or EMAIL_PASSWORD not configured; skipping email notification.');
+            }
             res.json({
                 success: true,
                 message: 'Email sent successfully'

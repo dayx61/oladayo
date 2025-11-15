@@ -59,8 +59,8 @@ export default function Contact() {
                 <Mail className="text-premium-accent flex-shrink-0 mt-1" size={24} />
                 <div>
                   <h3 className="font-semibold mb-2 light:text-light-text dark:text-dark-text">Email</h3>
-                  <a href="mailto:alabioladayoibrahim@hotmail.com" className="text-premium-accent hover:text-premium-blue transition-smooth">
-                    alabioladayoibrahim@hotmail.com
+                <a href="mailto:dayx61@gmail.com" className="text-premium-accent hover:text-premium-blue transition-smooth">
+                    dayx61@gmail.com
                   </a>
                 </div>
               </div>

@@ -2,7 +2,7 @@ const portfolioData = {
   name: 'Oladayo Alabi',
   title: 'IT Service Management & Technical Support | Information Technology Security Operations',
   location: 'Philadelphia, Pennsylvania, United States',
-  email: 'alabioladayoibrahim@hotmail.com',
+  email: 'dayx61@gmail.com',
   phone: '+1 267-957-4048',
   linkedin: 'https://www.linkedin.com/in/olaalabi53',
   summary: `As a versatile IT professional with over 7 years of experience in technical support, IT service management, and cybersecurity, I thrive on driving operational excellence, enhancing security frameworks, and delivering seamless user experiences.`,

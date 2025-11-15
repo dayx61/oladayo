@@ -1,5 +1,6 @@
 import { Calendar, Clock, ArrowRight, Search } from 'lucide-react';
 import { useState } from 'react';
+import axios from 'axios';
 
 interface Article {
   id: number;
@@ -85,6 +86,25 @@ const articles: Article[] = [
 export default function Blog() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [newsletterMessage, setNewsletterMessage] = useState('');
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail.trim()) return;
+    setNewsletterStatus('loading');
+    setNewsletterMessage('');
+    try {
+      await axios.post('/api/newsletter', { email: newsletterEmail.trim(), source: 'blog' });
+      setNewsletterStatus('success');
+      setNewsletterMessage('Thanks for subscribing! Watch your inbox for the latest posts.');
+      setNewsletterEmail('');
+    } catch (error: any) {
+      setNewsletterStatus('error');
+      setNewsletterMessage(error.response?.data?.error || 'Subscription failed. Please try again.');
+    }
+  };
 
   const categories = ['ITSM', 'Security', 'Leadership', 'Cloud', 'AI/ML', 'Transformation'];
 
@@ -234,23 +254,38 @@ export default function Blog() {
           <p className="light:text-light-text-secondary dark:text-dark-text-secondary mb-6">
             Subscribe to get the latest articles on IT, leadership, and digital transformation.
           </p>
-          <div className="flex gap-2">
+          <form onSubmit={handleSubscribe} className="flex flex-col gap-2 sm:flex-row">
             <input
               type="email"
+              value={newsletterEmail}
+              onChange={e => setNewsletterEmail(e.target.value)}
+              required
               placeholder="Enter your email"
               className="flex-1 px-4 py-3 rounded-lg
                 light:bg-light-bg light:border light:border-light-border light:text-light-text light:placeholder-light-text-secondary
                 dark:bg-dark-bg dark:border dark:border-dark-border dark:text-dark-text dark:placeholder-dark-text-secondary
                 focus:outline-none focus:ring-2 focus:ring-premium-accent"
             />
-            <button className="px-6 py-3 rounded-lg font-semibold
+            <button
+              type="submit"
+              disabled={newsletterStatus === 'loading'}
+              className="px-6 py-3 rounded-lg font-semibold
               bg-gradient-to-r from-premium-accent to-premium-blue
               text-premium-darker
               hover:shadow-lg hover:shadow-premium-accent/50
-              transition-all duration-300 transform hover:scale-105">
-              Subscribe
+              transition-all duration-300 transform hover:scale-105 disabled:opacity-50">
+              {newsletterStatus === 'loading' ? 'Subscribing...' : 'Subscribe'}
             </button>
-          </div>
+          </form>
+          {newsletterMessage && (
+            <p
+              className={`mt-3 text-sm ${
+                newsletterStatus === 'success' ? 'text-premium-green' : 'text-red-400'
+              }`}
+            >
+              {newsletterMessage}
+            </p>
+          )}
         </div>
       </div>
     </div>
