@@ -191,7 +191,9 @@ export default function Chat() {
         }
       }
       // Fallback to original error handling
-      else if (error.response?.data?.details) {
+      else if (error.response?.data?.error && error.response?.status === 503) {
+        errorContent = error.response.data.error; // Credits exhausted fallback
+      } else if (error.response?.data?.details) {
         errorContent = error.response.data.details;
       } else if (error.response?.data?.error) {
         errorContent = error.response.data.error;
@@ -201,8 +203,6 @@ export default function Chat() {
         errorContent = 'Authentication failed. Please check the API configuration.';
       } else if (error.response?.status === 429) {
         errorContent = 'Rate limited. Please wait 1-2 minutes and try again.';
-      } else if (error.response?.data?.error && error.response?.status === 503) {
-        errorContent = error.response.data.error; // Credits exhausted fallback
       } else if (error.code === 'ECONNABORTED') {
         errorContent = 'Request timeout. The AI service took too long to respond.';
       } else if (error.message === 'Network Error') {

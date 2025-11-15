@@ -3,6 +3,9 @@
     "browser": true,
     "es2020": true
   },
+  "globals": {
+    "RequestInit": "readonly"
+  },
   "extends": [
     "eslint:recommended"
   ],

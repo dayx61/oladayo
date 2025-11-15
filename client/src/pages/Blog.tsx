@@ -1,5 +1,5 @@
+import React, { useState } from 'react';
 import { Calendar, Clock, ArrowRight, Search } from 'lucide-react';
-import { useState } from 'react';
 import axios from 'axios';
 
 interface Article {
