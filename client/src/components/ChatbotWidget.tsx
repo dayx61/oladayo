@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Loader, Sparkles } from 'lucide-react';
+import { MessageCircle, X, Send, Loader, Sparkles, Wifi, WifiOff } from 'lucide-react';
 import axios from 'axios';
 
 interface Message {
@@ -9,13 +9,12 @@ interface Message {
   source?: string;
 }
 
-const PORTFOLIO_FALLBACK = `Oladayo is an IT leader with 7+ years across six organizations, focused on secure, reliable operations.
+const OFFLINE_FALLBACK = `Oladayo Alabi is an IT leader with 7+ years across six organizations, specializing in Microsoft Entra ID/Intune, cybersecurity, and IT service management. He delivers enterprise support for 800+ users with a 96% satisfaction rate and leads initiatives such as zero-trust security and large-scale Windows migrations. Connect via LinkedIn (linkedin.com/in/olaalabi53) or email alabioladayoibrahim@hotmail.com for professional inquiries.`;
 
-- Strengths: zero-trust security, automation, incident response, and SLA-driven support
-- Impact: 96% user satisfaction, 0 major incidents in 18 months, 45% faster ticket-to-fix via automation
-- Platforms: cloud + on-prem modernization, ITSM, and enterprise support for 800+ users
-- Leadership: builds and mentors teams, aligns IT KPIs to business outcomes
-- Contact: alabioladayoibrahim@hotmail.com • +1 267-957-4048 • LinkedIn: /in/olaalabi53`;
+type HealthResult =
+  | { status: 'online'; info?: { timestamp?: string } }
+  | { status: 'offline'; reason?: string }
+  | { status: 'checking'; reason?: string };
 
 const getApiBase = () => {
   const env = (typeof import.meta !== 'undefined' ? (import.meta as any).env : {}) || {};
@@ -31,6 +30,54 @@ const getApiBase = () => {
   }
 
   return isBrowser ? '/api' : '';
+};
+
+// Smart API Health Detection with timeout wrapper
+const fetchWithTimeout = (url: string, options: RequestInit = {}, timeout = 5000): Promise<Response> => {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error('Request timeout'));
+    }, timeout);
+
+    fetch(url, options)
+      .then(response => {
+        clearTimeout(timer);
+        resolve(response);
+      })
+      .catch(error => {
+        clearTimeout(timer);
+        reject(error);
+      });
+  });
+};
+
+const detectApiHealth = async (apiBase: string): Promise<HealthResult> => {
+  if (!apiBase) {
+    return { status: 'offline' as const, reason: 'Missing API base' };
+  }
+
+  try {
+    const response = await fetchWithTimeout(`${apiBase}/health`, { method: 'GET' }, 5000);
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return { status: 'offline' as const, reason: 'Health endpoint missing' };
+      }
+      return { status: 'checking' as const, reason: `Health status ${response.status}` };
+    }
+
+    const payload = await response.json().catch(() => null);
+    if (payload?.status === 'ok') {
+      return { status: 'online' as const, info: payload };
+    }
+
+    return { status: 'checking' as const, reason: 'Unexpected health payload' };
+  } catch (error: any) {
+    if (error?.message === 'Request timeout') {
+      return { status: 'offline' as const, reason: 'Health timeout' };
+    }
+    return { status: 'offline' as const, reason: 'Network failure' };
+  }
 };
 
 export default function ChatbotWidget() {
@@ -56,15 +103,30 @@ export default function ChatbotWidget() {
   }, [messages]);
 
   useEffect(() => {
-    const apiBase = getApiBase();
-    if (!apiBase) {
-      setApiStatus('offline');
-      return;
-    }
-    axios
-      .get(`${apiBase}/health`, { timeout: 5000 })
-      .then(() => setApiStatus('online'))
-      .catch(() => setApiStatus('offline'));
+    const checkApiHealth = async () => {
+      const apiBase = getApiBase();
+      if (!apiBase) {
+        setApiStatus('offline');
+        return;
+      }
+
+      setApiStatus('checking');
+      try {
+        const result = await detectApiHealth(apiBase);
+        setApiStatus(result.status);
+      } catch (error) {
+        console.warn('Health detection failed:', error);
+        setApiStatus('offline');
+      }
+    };
+
+    // Initial health check
+    checkApiHealth();
+
+    // Retry health check every 30 seconds
+    const healthCheckInterval = setInterval(checkApiHealth, 30000);
+
+    return () => clearInterval(healthCheckInterval);
   }, []);
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -94,23 +156,13 @@ export default function ChatbotWidget() {
         timeout: 30000
       });
 
-      if (response.data.fallback) {
-        const fallbackMessage: Message = {
-          role: 'assistant',
-          content: response.data.message,
-          timestamp: new Date().toISOString(),
-          source: response.data.source || 'Smart Portfolio Assistant'
-        };
-        setMessages(prev => [...prev, fallbackMessage]);
-      } else {
-        const assistantMessage: Message = {
-          role: 'assistant',
-          content: response.data.message,
-          timestamp: new Date().toISOString(),
-          source: response.data.source || 'OpenRouter AI'
-        };
-        setMessages(prev => [...prev, assistantMessage]);
-      }
+      const assistantMessage: Message = {
+        role: 'assistant',
+        content: response.data.message,
+        timestamp: new Date().toISOString(),
+        source: response.data.source || (response.data.fallback ? 'Smart Portfolio Assistant' : 'OpenRouter AI')
+      };
+      setMessages(prev => [...prev, assistantMessage]);
       setApiStatus('online');
     } catch (error: any) {
       console.error('Chat error:', error);
@@ -130,7 +182,7 @@ export default function ChatbotWidget() {
       
       const errorMessage: Message = {
         role: 'assistant',
-        content: `⚠️ Connection hiccup (${errorContent}).\n\nHere’s a quick profile while I reconnect:\n${PORTFOLIO_FALLBACK}`,
+        content: `⚠️ Connection hiccup (${errorContent}).\n\n${OFFLINE_FALLBACK}`,
         timestamp: new Date().toISOString(),
         source: 'Portfolio Snapshot'
       };
@@ -138,6 +190,50 @@ export default function ChatbotWidget() {
       setApiStatus('offline');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getStatusDisplay = () => {
+    switch (apiStatus) {
+      case 'online':
+        return (
+          <div className="flex items-center gap-1 text-emerald-400">
+            <Wifi size={12} />
+            <span>AI Connected ✓</span>
+          </div>
+        );
+      case 'checking':
+        return (
+          <div className="flex items-center gap-1 text-amber-300">
+            <Loader size={12} className="animate-spin" />
+            <span>Connecting...</span>
+          </div>
+        );
+      case 'offline':
+        return (
+          <div className="flex items-center gap-1 text-red-400">
+            <WifiOff size={12} />
+            <span>Offline — showing snapshot</span>
+          </div>
+        );
+      default:
+        return (
+          <div className="flex items-center gap-1 text-gray-400">
+            <span>Loading...</span>
+          </div>
+        );
+    }
+  };
+
+  const handleManualRetry = async () => {
+    setApiStatus('checking');
+    const apiBase = getApiBase();
+    if (apiBase) {
+      detectApiHealth(apiBase)
+        .then(result => setApiStatus(result.status))
+        .catch(() => setApiStatus('offline'));
+    } else {
+      setApiStatus('offline');
     }
   };
 
@@ -169,21 +265,18 @@ export default function ChatbotWidget() {
               <Sparkles size={18} className="text-premium-accent" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">AI Assistant</h3>
-              <p className="text-[11px] text-gray-400 flex items-center gap-1">
-                <span
-                  className={`h-2 w-2 rounded-full ${
-                    apiStatus === 'online'
-                      ? 'bg-emerald-400'
-                      : apiStatus === 'checking'
-                      ? 'bg-amber-300'
-                      : 'bg-red-400'
-                  }`}
-                ></span>
-                {apiStatus === 'online' && 'Connected to OpenRouter'}
-                {apiStatus === 'checking' && 'Checking connection…'}
-                {apiStatus === 'offline' && 'Offline — showing snapshot'}
-              </p>
+              <h3 className="text-lg font-bold text-white">Ola's AI Assistant</h3>
+              <div className="text-[11px] text-gray-400">
+                {getStatusDisplay()}
+              </div>
+              {apiStatus === 'offline' && (
+                <button
+                  onClick={handleManualRetry}
+                  className="text-[10px] text-premium-accent hover:text-premium-accent-2 underline mt-1"
+                >
+                  🔄 Retry Connection
+                </button>
+              )}
             </div>
           </div>
           <button
