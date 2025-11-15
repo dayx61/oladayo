@@ -1,27 +1,18 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "client/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
+  "buildCommand": "cd client && npm install && npm run build",
+  "outputDirectory": "client/dist",
   "functions": {
-    "api/**/*.ts": {
+    "api/chat.ts": {
+      "runtime": "nodejs20.x"
+    },
+    "api/contact.ts": {
+      "runtime": "nodejs20.x"
+    },
+    "api/health.ts": {
+      "runtime": "nodejs20.x"
+    },
+    "api/portfolio.ts": {
       "runtime": "nodejs20.x"
     }
-  },
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/client/dist/$1"
-    }
-  ]
+  }
 }
