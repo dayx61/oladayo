@@ -1,5 +1,10 @@
-import app from './index';
-
 export default function handler(req: any, res: any) {
-  return app(req, res);
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString()
+  });
 }
