@@ -118,10 +118,9 @@ professional-it-portfolio/
 │   ├── package.json           # Backend dependencies
 │   └── tsconfig.json          # TypeScript config
 ├── api/                       # Vercel serverless functions
-│   ├── chat.ts                # AI chatbot API
-│   ├── contact.ts             # Contact form API
-│   ├── health.ts              # Health check API
-│   └── index.ts               # Main API entry point
+│   ├── health.html            # Health check HTML page
+│   ├── health.js              # Health check API (serverless)
+│   ├── index.ts               # Combined API endpoints (chat, contact, health, portfolio)
 │   └── portfolio.ts           # Portfolio data API
 ├── node_modules/              # Monorepo dependencies
 └── .git/                      # Git repository metadata
