@@ -18,11 +18,14 @@ A cutting-edge, full-stack portfolio website showcasing modern web technologies 
 - **Smooth Transitions**: 300ms cubic-bezier animations for all interactions
 
 ### 🤖 **AI-Powered Features**
-- **OpenRouter AI Integration**: Advanced conversational AI with multiple LLM models
-- **Context-Aware Chat**: Remembers full conversation history
-- **Multi-Topic Intelligence**: Answers about professional background and general topics
-- **Professional Persona**: Maintains professional communication tone
-- **Error Resilience**: Graceful fallbacks and retry mechanisms
+- **OpenRouter AI Integration**: Advanced conversational AI with multiple LLM models and providers
+- **Context-Aware Chat**: Remembers full conversation history with smart truncation
+- **Multi-Topic Intelligence**: Answers about professional background, skills, and general topics
+- **Professional Persona**: Maintains professional communication with customizable tone
+- **Smart Fallbacks**: Intelligent responses when AI service is unavailable
+- **Rate Limit Handling**: Automatic retry mechanisms and user-friendly error messages
+- **Model Selection**: Dynamic model switching based on context and availability
+- **Token Optimization**: Efficient token usage with conversation history management
 
 ### 📊 **Data & Analytics**
 - **Interactive Visualizations**: Recharts-powered career progression charts
@@ -31,12 +34,14 @@ A cutting-edge, full-stack portfolio website showcasing modern web technologies 
 - **Performance Tracking**: Career trajectory and skill development analytics
 
 ### 🛠️ **Modern Tech Stack**
-- **React 18 + TypeScript**: Latest React with full type safety
-- **Vite 5.4**: Lightning-fast development and building (2x faster than create-react-app)
-- **Vercel Serverless Functions**: Backend deployed as serverless API routes
-- **Monorepo Architecture**: Proper workspace configuration with npm workspaces
+- **React 18 + TypeScript**: Latest React with full type safety and concurrent features
+- **Vite 5.0**: Lightning-fast development and building with HMR
+- **Express.js + Vercel Serverless**: Dual backend architecture for optimal performance
+- **Monorepo Architecture**: Advanced workspace configuration with npm workspaces
 - **ESLint + Stylelint**: Comprehensive code quality and CSS linting
-- **Responsive Design**: Mobile-first with 5 breakpoint system
+- **Framer Motion**: Premium animations with hardware acceleration
+- **Radix UI**: Accessible, unstyled UI components
+- **Responsive Design**: Mobile-first with 5 breakpoint system and fluid typography
 
 ### 🌟 **Advanced Interactions**
 - **Micro-interactions**: Hover effects, scaling, and smooth transforms
@@ -65,24 +70,32 @@ A cutting-edge, full-stack portfolio website showcasing modern web technologies 
 ## 🛠️ **Tech Stack & Versions**
 
 ### Frontend (November 2025)
-- **React 18.3** with TypeScript 5.6
-- **Vite 5.4** for optimal build performance
-- **TailwindCSS 3.4** with custom theme configuration
-- **Recharts 2.13** for interactive data visualizations
-- **Lucide React 0.468** for consistent iconography
-- **Axios 1.7** for type-safe API communication
+- **React 18.2** with TypeScript 5.2
+- **Vite 5.0** for lightning-fast development and building
+- **TailwindCSS 3.3** with custom theme configuration
+- **Framer Motion 10.16** for premium animations
+- **Recharts 2.10** for interactive data visualizations
+- **Lucide React 0.294** for consistent iconography
+- **React Router DOM 6.20** for client-side routing
+- **Axios 1.6** for type-safe API communication
+- **Radix UI** for accessible UI components
 
 ### Backend (November 2025)
-- **Vercel Serverless Functions** with TypeScript
-- **OpenRouter API** with multiple LLM integrations
+- **Express.js 4.18** with TypeScript 5.3
+- **Vercel Serverless Functions** for production deployment
+- **OpenRouter API** with advanced LLM integrations
 - **Nodemailer 6.9** for email processing
-- **TypeScript 5.6** for full-stack type safety
+- **TSX 4.20** for fast TypeScript execution
+- **CORS 2.8** for secure cross-origin requests
 
 ### Development Tools
-- **ESLint 9.15** with TypeScript rules
+- **ESLint 8.54** with TypeScript and React rules
 - **Stylelint 16.9** for CSS linting
+- **TypeScript 5.2-5.3** for full-stack type safety
+- **TSX 4.20** for fast TypeScript execution in development
 - **Vercel CLI** for deployment orchestration
 - **npm workspaces** for monorepo management
+- **Concurrently 8.2** for parallel script execution
 
 ## 📦 **Project Structure**
 
@@ -113,7 +126,9 @@ professional-it-portfolio/
 │   └── .eslintrc.json         # ESLint configuration
 ├── server/                    # Express.js backend (local development)
 │   ├── src/
-│   │   └── index.ts           # Main server & API routes
+│   │   ├── app.ts             # Express app factory with API routes
+│   │   └── index.ts           # Server entry point
+│   ├── dist/                  # Compiled TypeScript output
 │   ├── .env                   # Environment variables (gitignored)
 │   ├── package.json           # Backend dependencies
 │   └── tsconfig.json          # TypeScript config
@@ -159,8 +174,24 @@ npm run dev
 ```
 
 This will start:
-- **Frontend**: http://localhost:5173 (Vite dev server)
-- **Backend**: http://localhost:5002 (Express server)
+- **Frontend**: http://localhost:5173 (Vite dev server with HMR)
+- **Backend**: http://localhost:5002 (Express server with TSX hot reloading)
+
+### Alternative Development Commands
+
+Run frontend only:
+```bash
+npm run dev:client
+# or
+cd client && npm run dev
+```
+
+Run backend only:
+```bash
+npm run dev:server
+# or
+cd server && npm run dev
+```
 
 ### Building
 
@@ -174,27 +205,38 @@ Build client only:
 cd client && npm run build
 ```
 
-## 🔌 **API Endpoints**
+## 🔌 **API Architecture**
 
-### Vercel Serverless Functions Structure
+### Dual Deployment Strategy
+- **Vercel Serverless Functions**: Production deployment with zero cold starts
+- **Express.js Local Server**: Development environment with hot reloading
 
-#### 🤖 **Chat API**
+### API Endpoints
+
+#### 🤖 **AI Chat API**
 - **POST** `/api/chat`
-  - Request: `{ message: string, conversationHistory: Message[], category?: string }`
-  - Response: `{ success: boolean, message: string, metadata: { timestamp, category, tokens } }`
+  - Request: `{ message: string, conversationHistory?: Message[], category?: string, model?: string }`
+  - Response: `{ success: boolean, message: string, source: string, model: string, provider: string, metadata: { timestamp, category, runtime, tokens } }`
+  - Features: Context-aware conversations, multiple LLM models, smart fallbacks
 
-#### 📧 **Contact API**
+#### 📧 **Contact Form API**
 - **POST** `/api/contact`
   - Request: `{ name: string, email: string, subject: string, message: string }`
   - Response: `{ success: boolean, message: string }`
+  - Features: Email validation, HTML email templates, Gmail SMTP integration
 
 #### 📊 **Portfolio Data API**
 - **GET** `/api/portfolio`
-  - Response: `{ success: boolean, data: PortfolioData }`
+  - Response: `{ success: true, data: PortfolioData }`
+  - Features: Comprehensive professional data including experience, skills, certifications
 
-#### ❤️ **Health Check API**
-- **GET** `/api/health`
-  - Response: `{ status: 'ok', timestamp: string }`
+#### ❤️ **Health Check APIs**
+- **GET** `/api/health` (Express/Local)
+  - Response: `{ status: 'ok', timestamp: string, service: string, environment: string }`
+- **GET** `/api/health.js` (Vercel Serverless)
+  - Response: `{ status: 'ok', timestamp: string, service: string, environment: string }`
+- **GET** `/api/health.html` (Static HTML)
+  - Returns HTML health check page
 
 ## 🌐 Deployment to Vercel
 
@@ -333,28 +375,38 @@ For local development contributions:
 
 ```json
 // Main commands
-"npm run dev"         - Start both frontend and backend
-"npm run build"       - Build for production
+"npm run dev"         - Start both frontend and backend concurrently
+"npm run build"       - Build client for production deployment
 "npm run build:client" - Build only the client
-"build:server"        - Build only the server
+"npm run build:server" - Build only the server
+"npm run start"       - Start production server from built files
 
-// Client specific
-"npm run dev --workspace=client" - Start frontend dev server
+// Development commands
+"npm run dev:client"  - Start frontend dev server only
+"npm run dev:server"  - Start backend dev server only
+
+// Workspace specific (alternative)
+"npm run dev --workspace=client"  - Start frontend dev server
 "npm run build --workspace=client" - Build frontend
-
-// Server specific
-"npm run dev --workspace=server" - Start backend dev server
+"npm run dev --workspace=server"  - Start backend dev server
 ```
 
 ## 🔄 Update History
 
-### November 2025
-- Complete rewrite with Vercel serverless architecture
-- Modular API structure with separate endpoints
-- Enhanced AI chatbot with multiple LLM support
-- Improved theme system with premium glass effects
-- Comprehensive error handling and fallback systems
-- Production-ready build optimization
+### November 2025 (Latest)
+- **Dual Backend Architecture**: Express.js for development + Vercel serverless for production
+- **Advanced AI Integration**: Multi-model LLM support with intelligent fallbacks and rate limiting
+- **Modular API Design**: Consolidated endpoints with enhanced error handling
+- **Premium UI Enhancements**: Framer Motion animations and Radix UI components
+- **Type-Safe Architecture**: Full TypeScript coverage across frontend and backend
+- **Performance Optimizations**: Vite 5.0 with optimized build pipeline
+- **Security Improvements**: Enhanced CORS configuration and input validation
+
+### October 2025
+- Initial portfolio structure with React & TypeScript
+- AI integration with OpenRouter API
+- Theme toggle and animation system
+- Contact form with email functionality
 
 ### October 2025
 - Initial portfolio structure with React & TypeScript
@@ -371,21 +423,28 @@ This professional portfolio is proprietary and for personal use.
 ## 🏆 **Technologies & Architecture**
 
 ### 🌟 **Modern Full-Stack Architecture**
-- **Vercel Serverless Functions**: Zero cold starts, auto-scaling API
-- **Monorepo Management**: Optimized with npm workspaces
-- **Type-Safe Communication**: End-to-end TypeScript interfaces
-- **Edge Deployment**: Global CDN with instant cache invalidation
+- **Hybrid Backend**: Vercel serverless for production + Express.js for development
+- **Monorepo Excellence**: Advanced npm workspaces with optimized dependency management
+- **Type-Safe Ecosystem**: End-to-end TypeScript with strict type checking
+- **Edge Deployment**: Global CDN with instant cache invalidation and edge functions
+- **Hot Module Replacement**: Instant updates during development with Vite HMR
+- **Concurrent Rendering**: React 18 features with automatic batching
 
 ### 🤖 **AI Integration Features**
-- **Multi-Provider LLM Support**: OpenRouter with fallback options
-- **Conversational Context**: Persistent dialogue memory
-- **Professional Branding**: Custom AI persona training
-- **Real-time Error Handling**: Immediate fallback responses
+- **Multi-Provider LLM Support**: OpenRouter with 20+ models and automatic failover
+- **Conversational Context**: Persistent dialogue memory with smart history management
+- **Professional Branding**: Custom AI persona with portfolio-specific knowledge
+- **Real-time Error Handling**: Intelligent fallback responses with graceful degradation
+- **Rate Limit Management**: Automatic retry logic and user-friendly error messages
+- **Model Optimization**: Dynamic model selection based on query complexity
+- **Token Efficiency**: Optimized prompt engineering for cost-effective responses
 
 ### 💫 **Premium UI/UX**
-- **Fluid Animations**: CSS-in-JS with performance optimization
-- **Theme Intelligence**: Automatic system preference detection
-- **Progressive Enhancement**: Works without JavaScript
-- **Accessibility First**: Screen reader and keyboard navigation
+- **Fluid Animations**: Framer Motion with hardware acceleration and performance optimization
+- **Theme Intelligence**: Automatic system preference detection with persistent storage
+- **Progressive Enhancement**: Core functionality works without JavaScript
+- **Accessibility First**: WCAG 2.1 AA compliant with screen reader and keyboard navigation
+- **Component Architecture**: Radix UI primitives with custom styling
+- **Responsive Design**: Mobile-first with fluid typography and adaptive layouts
 
 Built with ❤️ using cutting-edge web technologies | **November 2025**
