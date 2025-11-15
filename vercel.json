@@ -1,10 +1,17 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "outputDirectory": "client/dist",
   "functions": {
-    "server/dist/index.js": {
+    "api/index.ts": {
+      "runtime": "nodejs20.x",
       "memory": 1024,
       "maxDuration": 60
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.ts"
+    }
+  ]
 }

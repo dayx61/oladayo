@@ -54,23 +54,43 @@ export default function PremiumHome() {
             {/* Right Visual - Interactive Cards */}
             <div className="relative h-96 lg:h-full flex items-center justify-center animate-slideUp" style={{ animationDelay: '0.2s' }}>
               <div className="relative w-full h-full max-h-96 lg:max-h-none flex items-center justify-center">
-                {/* Floating cards */}
-                <div className="absolute w-64 h-40 bg-gradient-to-br from-premium-accent/20 to-premium-blue/10 rounded-2xl border border-premium-accent/40 backdrop-blur-xl p-6 shadow-2xl shadow-premium-accent/10 transform -rotate-6 hover:rotate-0 transition-transform duration-300 cursor-pointer">
-                  <div className="text-4xl mb-3">🔐</div>
-                  <h3 className="font-bold light:text-light-text dark:text-white mb-1">Security First</h3>
-                  <p className="text-sm light:text-light-text-secondary dark:text-gray-400">Enterprise-grade security</p>
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-br from-premium-accent/10 via-premium-purple/10 to-premium-blue/10 rounded-3xl blur-3xl"></div>
 
-                <div className="absolute w-64 h-40 bg-gradient-to-br from-premium-purple/20 to-premium-blue/10 rounded-2xl border border-premium-purple/40 backdrop-blur-xl p-6 shadow-2xl shadow-premium-purple/10 transform rotate-3 hover:rotate-0 transition-transform duration-300 cursor-pointer -ml-32">
-                  <div className="text-4xl mb-3">⚡</div>
-                  <h3 className="font-bold light:text-light-text dark:text-white mb-1">High Performance</h3>
-                  <p className="text-sm light:text-light-text-secondary dark:text-gray-400">Optimized operations</p>
-                </div>
+                <div className="relative w-full max-w-xl p-8 rounded-3xl border light:border-light-border dark:border-premium-accent/30 light:bg-white/90 dark:bg-gradient-to-br dark:from-premium-darker/80 dark:via-premium-slate/60 dark:to-premium-blue/20 backdrop-blur-xl shadow-2xl light:shadow-gray-200/70 dark:shadow-premium-accent/20 transition-colors">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="h-10 w-10 rounded-full light:bg-premium-accent/10 dark:bg-premium-accent/20 border border-premium-accent/40 flex items-center justify-center">
+                      <Zap size={22} className="text-premium-accent" aria-hidden />
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.2em] light:text-light-text-secondary dark:text-gray-400">Signature Playbook</p>
+                      <p className="text-2xl font-bold light:text-premium-darker dark:text-white">Reliability. Automation. Growth.</p>
+                    </div>
+                  </div>
 
-                <div className="absolute w-64 h-40 bg-gradient-to-br from-premium-blue/20 to-premium-accent/10 rounded-2xl border border-premium-blue/40 backdrop-blur-xl p-6 shadow-2xl shadow-premium-blue/10 transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-pointer mt-32">
-                  <div className="text-4xl mb-3">🚀</div>
-                  <h3 className="font-bold light:text-light-text dark:text-white mb-1">Innovation</h3>
-                  <p className="text-sm light:text-light-text-secondary dark:text-gray-400">Cutting-edge solutions</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {[
+                      { icon: Shield, title: 'Zero-Trust Backbone', detail: 'Security first architectures that stay audit-ready' },
+                      { icon: Zap, title: 'Automation First', detail: 'Runbooks to workflows—45% faster ticket-to-fix' },
+                      { icon: Rocket, title: 'Future-Ready', detail: 'Modernize without downtime; cloud and on-prem in sync' },
+                      { icon: Target, title: 'Business-Aligned', detail: 'KPIs that map to revenue, risk, and resilience' }
+                    ].map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="p-4 rounded-2xl border light:border-light-border dark:border-premium-accent/20 light:bg-light-bg-secondary/70 dark:bg-premium-slate/40 hover:border-premium-accent/60 transition-all duration-300"
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <item.icon size={18} className="text-premium-accent" aria-hidden />
+                          <p className="font-semibold light:text-premium-darker dark:text-white">{item.title}</p>
+                        </div>
+                        <p className="text-sm light:text-light-text-secondary dark:text-gray-300 leading-relaxed">{item.detail}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-8 p-4 rounded-2xl border light:border-light-border dark:border-premium-accent/30 light:bg-light-bg-secondary dark:bg-premium-accent/10 text-center">
+                    <p className="text-sm uppercase tracking-[0.2em] light:text-premium-darker dark:text-premium-darker font-semibold">Result Highlight</p>
+                    <p className="text-lg font-bold light:text-premium-darker dark:text-premium-darker">0 major incidents in 18 months • 96% user satisfaction</p>
+                  </div>
                 </div>
               </div>
             </div>

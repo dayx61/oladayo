@@ -27,24 +27,49 @@ interface Message {
 const SUGGESTED_QUESTIONS = [
   'Tell me about the developer\'s IT experience',
   'What are the key skills and expertise?',
-  'Who is the CEO of Amazon?',
+  'What outcomes has he delivered?',
   'Explain IT Service Management',
   'What certifications are highlighted?',
   'How can I get in touch?'
 ];
 
+const PORTFOLIO_FALLBACK = `Oladayo is an IT leader with 7+ years across six organizations, focused on secure, reliable operations.
+
+- Strengths: zero-trust security, automation, incident response, and SLA-driven support
+- Impact: 96% user satisfaction, 0 major incidents in 18 months, 45% faster ticket-to-fix via automation
+- Platforms: cloud + on-prem modernization, ITSM, and enterprise support for 800+ users
+- Leadership: builds and mentors teams, aligns IT KPIs to business outcomes
+- Contact: alabioladayoibrahim@hotmail.com • +1 267-957-4048 • LinkedIn: /in/olaalabi53`;
+
 export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: '✨ Welcome! I\'m the AI Portfolio Assistant. I can answer questions about the developer\'s IT expertise, experience, skills, and more. What would you like to know?',
+      content: '✨ Hi! I\'m Oladayo\'s AI Assistant (OpenRouter). Ask anything about his IT expertise, experience, skills, or general questions. If the live AI is offline, I\'ll still share a quick profile snapshot for you.',
       timestamp: new Date().toISOString()
     }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+  const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const getApiBase = () => {
+    const env = (typeof import.meta !== 'undefined' ? (import.meta as any).env : {}) || {};
+    const explicit = env.VITE_API_URL;
+    if (explicit) return explicit;
+
+    const isBrowser = typeof window !== 'undefined';
+    const isLocal = isBrowser && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+    if (isLocal) {
+      const port = env.VITE_API_PORT || '5002';
+      return `http://localhost:${port}/api`;
+    }
+
+    return isBrowser ? `${window.location.origin}/api` : '';
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -53,6 +78,19 @@ export default function Chat() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Check API health on mount to surface connectivity issues early
+  useEffect(() => {
+    const apiBase = getApiBase();
+    if (!apiBase) {
+      setApiStatus('offline');
+      return;
+    }
+    axios
+      .get(`${apiBase}/health`, { timeout: 5000 })
+      .then(() => setApiStatus('online'))
+      .catch(() => setApiStatus('offline'));
+  }, []);
 
   const handleSendMessage = async (e: React.FormEvent, messageText?: string) => {
     e.preventDefault();
@@ -69,13 +107,13 @@ export default function Chat() {
     setLoading(true);
 
     try {
-      // Determine API URL based on environment
-      const apiUrl = process.env.REACT_APP_API_URL || 
-                     (typeof window !== 'undefined' && window.location.hostname === 'localhost' 
-                       ? 'http://localhost:5001' 
-                       : 'https://oladayo-portfolio-server.vercel.app');
-      
-      const response = await axios.post(`${apiUrl}/api/chat`, {
+      // Determine API URL based on environment and fall back to same-origin /api in prod
+      const apiBase = getApiBase();
+      if (!apiBase) {
+        throw new Error('API base URL is not configured');
+      }
+
+      const response = await axios.post(`${apiBase}/chat`, {
         message: textToSend,
         conversationHistory: messages.map(m => ({ role: m.role, content: m.content })),
         category: 'general'
@@ -109,10 +147,27 @@ export default function Chat() {
         };
         setMessages(prev => [...prev, assistantMessage]);
       }
+      setApiStatus('online');
     } catch (error: any) {
       console.error('Chat error:', error);
       console.error('Error response data:', error.response?.data);
       console.error('Error status:', error.response?.status);
+
+      // Check if this is a fallback response from the server (e.g., credits exhausted but still providing data)
+      if (error.response?.data?.fallback && error.response?.data?.message) {
+        const fallbackMessage: Message = {
+          role: 'assistant',
+          content: error.response.data.message,
+          timestamp: new Date().toISOString(),
+          source: error.response.data.source || 'Smart Portfolio Assistant',
+          model: error.response.data.source || 'Smart Portfolio Assistant',
+          provider: error.response.data.provider || 'Portfolio Intelligence',
+          metadata: error.response.data.metadata
+        };
+        setMessages(prev => [...prev, fallbackMessage]);
+        setApiStatus('offline');
+        return;
+      }
 
       let errorContent = 'Sorry, I encountered an error. Please try again later.';
 
@@ -138,6 +193,8 @@ export default function Chat() {
       // Fallback to original error handling
       else if (error.response?.data?.details) {
         errorContent = error.response.data.details;
+      } else if (error.response?.data?.error) {
+        errorContent = error.response.data.error;
       } else if (error.response?.data?.message) {
         errorContent = error.response.data.message;
       } else if (error.response?.status === 401) {
@@ -156,10 +213,13 @@ export default function Chat() {
 
       const errorMessage: Message = {
         role: 'assistant',
-        content: `⚠️ ${errorContent}`,
-        timestamp: new Date().toISOString()
+        content: `⚠️ Connection hiccup (${errorContent}).\n\nHere's a quick profile while I reconnect:\n${PORTFOLIO_FALLBACK}`,
+        timestamp: new Date().toISOString(),
+        source: 'Portfolio Snapshot',
+        provider: 'Offline mode'
       };
       setMessages(prev => [...prev, errorMessage]);
+      setApiStatus('offline');
     } finally {
       setLoading(false);
     }
@@ -182,9 +242,9 @@ export default function Chat() {
   };
 
   return (
-    <div className="min-h-screen bg-premium-darker flex flex-col">
+    <div className="min-h-screen flex flex-col light:bg-light-bg light:text-light-text dark:bg-premium-darker dark:text-gray-100 transition-colors duration-300">
       {/* Header */}
-      <div className="border-b border-premium-accent/20 bg-gradient-to-r from-premium-accent/5 to-premium-blue/5 backdrop-blur-sm sticky top-16 z-10">
+      <div className="border-b light:border-light-border dark:border-premium-accent/20 light:bg-white/80 dark:bg-gradient-to-r dark:from-premium-accent/5 dark:to-premium-blue/5 backdrop-blur-sm sticky top-16 z-10 transition-colors">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -192,13 +252,26 @@ export default function Chat() {
                 <Sparkles size={24} className="text-premium-darker" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-white">AI Chat</h1>
-                <p className="text-sm text-gray-400">Powered by OpenRouter</p>
+                <h1 className="text-3xl font-bold light:text-premium-darker dark:text-white">AI Chat</h1>
+                <p className="text-sm light:text-light-text-secondary dark:text-gray-400 flex items-center gap-2">
+                  <span
+                    className={`h-2.5 w-2.5 rounded-full ${
+                      apiStatus === 'online'
+                        ? 'bg-emerald-500'
+                        : apiStatus === 'checking'
+                        ? 'bg-amber-400'
+                        : 'bg-red-500'
+                    }`}
+                  ></span>
+                  {apiStatus === 'online' && 'Connected to OpenRouter'}
+                  {apiStatus === 'checking' && 'Checking connection...'}
+                  {apiStatus === 'offline' && 'Offline — using local snapshot'}
+                </p>
               </div>
             </div>
             <button
               onClick={clearChat}
-              className="p-2 hover:bg-premium-accent/20 rounded-lg transition-colors text-gray-400 hover:text-premium-accent"
+              className="p-2 rounded-lg transition-colors light:text-light-text-secondary dark:text-gray-400 hover:text-premium-accent hover:bg-premium-accent/10 dark:hover:bg-premium-accent/20"
               title="Clear chat"
             >
               <RefreshCw size={20} />
@@ -220,15 +293,15 @@ export default function Chat() {
                 className={`max-w-2xl ${
                   msg.role === 'user'
                     ? 'bg-gradient-to-r from-premium-accent to-premium-blue text-premium-darker'
-                    : 'bg-premium-slate/80 border border-premium-accent/30 text-gray-100'
+                    : 'light:bg-light-bg-secondary light:border-light-border light:text-light-text dark:bg-premium-slate/80 dark:border-premium-accent/30 dark:text-gray-100'
                 } px-6 py-4 rounded-2xl shadow-lg`}
               >
                 <p className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">{msg.content}</p>
 
                 {/* Enhanced Metadata Display for Assistant Messages */}
                 {msg.role === 'assistant' && (
-                  <div className="mt-3 pt-3 border-t border-gray-600/30">
-                    <div className="flex flex-wrap items-center gap-4 text-xs opacity-60">
+                  <div className="mt-3 pt-3 border-t light:border-light-border dark:border-gray-600/30">
+                    <div className="flex flex-wrap items-center gap-4 text-xs opacity-70 light:text-light-text-secondary dark:text-gray-300">
                       {msg.source && (
                         <span className="flex items-center gap-1">
                           📡 {msg.source}
@@ -240,24 +313,18 @@ export default function Chat() {
                         </span>
                       )}
                       {msg.model && (
-                        <span className="flex items-center gap-1">
-                          🤖 ${msg.model}
-                        </span>
+                        <span className="flex items-center gap-1">{`🤖 ${msg.model}`}</span>
                       )}
                       {msg.metadata?.runtime?.generation_time && (
-                        <span className="flex items-center gap-1">
-                          ⚡ ${Math.round(msg.metadata.runtime.generation_time / 1000 * 10) / 10}s
-                        </span>
+                        <span className="flex items-center gap-1">{`⚡ ${
+                          Math.round((msg.metadata.runtime.generation_time / 1000) * 10) / 10
+                        }s`}</span>
                       )}
                       {msg.metadata?.tokens?.total && (
-                        <span className="flex items-center gap-1">
-                          📊 ${msg.metadata.tokens.total} tokens
-                        </span>
+                        <span className="flex items-center gap-1">{`📊 ${msg.metadata.tokens.total} tokens`}</span>
                       )}
                       {msg.metadata?.category && (
-                        <span className="flex items-center gap-1">
-                          🏷️ ${msg.metadata.category}
-                        </span>
+                        <span className="flex items-center gap-1">{`🏷️ ${msg.metadata.category}`}</span>
                       )}
                       <button
                         onClick={() => copyToClipboard(msg.content, idx)}
@@ -274,9 +341,9 @@ export default function Chat() {
           ))}
           {loading && (
             <div className="flex justify-start animate-slideUp">
-              <div className="bg-premium-slate/80 border border-premium-accent/30 px-6 py-4 rounded-2xl flex items-center gap-3 shadow-lg">
+              <div className="px-6 py-4 rounded-2xl flex items-center gap-3 shadow-lg light:bg-light-bg-secondary light:border-light-border dark:bg-premium-slate/80 dark:border-premium-accent/30 transition-colors">
                 <Loader size={18} className="animate-spin text-premium-accent" />
-                <span className="text-sm text-gray-300">AI is thinking...</span>
+                <span className="text-sm light:text-light-text-secondary dark:text-gray-300">AI is thinking...</span>
               </div>
             </div>
           )}
@@ -286,7 +353,7 @@ export default function Chat() {
         {/* Suggested Questions */}
         {messages.length === 1 && !loading && (
           <div className="mb-6">
-            <p className="text-xs text-gray-400 mb-3 uppercase tracking-wider">Try asking:</p>
+            <p className="text-xs light:text-light-text-secondary dark:text-gray-400 mb-3 uppercase tracking-wider">Try asking:</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {SUGGESTED_QUESTIONS.map((question, idx) => (
                 <button
@@ -295,7 +362,7 @@ export default function Chat() {
                     e.preventDefault();
                     handleSendMessage(e, question);
                   }}
-                  className="text-left p-3 rounded-lg border border-premium-accent/30 hover:border-premium-accent/60 bg-premium-slate/40 hover:bg-premium-slate/60 text-gray-300 hover:text-white transition-all text-sm"
+                  className="text-left p-3 rounded-lg border light:border-light-border dark:border-premium-accent/30 light:bg-light-bg-secondary dark:bg-premium-slate/40 hover:border-premium-accent/60 light:hover:bg-light-bg dark:hover:bg-premium-slate/60 light:text-light-text dark:text-gray-300 hover:text-white transition-all text-sm"
                 >
                   {question}
                 </button>
@@ -305,7 +372,7 @@ export default function Chat() {
         )}
 
         {/* Input Area */}
-        <div className="border-t border-premium-accent/20 pt-6">
+        <div className="border-t light:border-light-border dark:border-premium-accent/20 pt-6 transition-colors">
           <form onSubmit={handleSendMessage} className="flex gap-3">
             <input
               type="text"
@@ -313,7 +380,7 @@ export default function Chat() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask anything about the developer or any topic..."
               disabled={loading}
-              className="flex-1 bg-premium-slate/60 border border-premium-accent/30 rounded-xl px-5 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-premium-accent focus:ring-2 focus:ring-premium-accent/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 light:bg-light-bg-secondary dark:bg-premium-slate/60 light:border-light-border dark:border-premium-accent/30 rounded-xl px-5 py-4 light:text-light-text dark:text-white placeholder-gray-500 focus:outline-none focus:border-premium-accent focus:ring-2 focus:ring-premium-accent/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <button
               type="submit"
@@ -324,7 +391,7 @@ export default function Chat() {
               <Send size={20} />
             </button>
           </form>
-          <p className="text-xs text-gray-500 mt-3 text-center">
+          <p className="text-xs light:text-light-text-secondary dark:text-gray-500 mt-3 text-center">
             Powered by OpenRouter
           </p>
         </div>

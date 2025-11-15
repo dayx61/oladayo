@@ -20,6 +20,11 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
+// Lightweight local responder for greetings/basic small talk when AI is offline or not needed
+function isGreeting(message) {
+    const trimmed = message.trim().toLowerCase();
+    return ['hi', 'hello', 'hey', 'yo', 'hola', 'howdy'].includes(trimmed) || /^hi[\s!.,]*$/i.test(message) || /^hello[\s!.,]*$/i.test(message);
+}
 // Portfolio data
 const portfolioData = {
     name: 'Oladayo Alabi',
@@ -249,7 +254,23 @@ app.post('/api/chat', async (req, res, next) => {
         if (!message || message.trim().length === 0) {
             return res.status(400).json({ error: 'Message cannot be empty' });
         }
+        // Quick local response for greetings to reduce AI calls and improve perceived responsiveness
+        if (isGreeting(message)) {
+            return res.json({
+                success: true,
+                message: `👋 Hey there! I'm Oladayo's AI assistant. I can share his experience, skills, certifications, projects, or help connect you with him. What would you like to know?`,
+                source: 'Local responder',
+                model: 'local-greeting',
+                provider: 'On-device',
+                metadata: {
+                    category: category || 'greeting',
+                    runtime: { generation_time: 5, latency: 5, tokens_per_second: null },
+                    tokens: { prompt: 0, completion: 0, total: 0 }
+                }
+            });
+        }
         const apiKey = process.env.OPENROUTER_API_KEY;
+        console.log('API Key present:', !!apiKey, 'Key starts with:', apiKey ? apiKey.substring(0, 12) + '...' : 'none');
         if (!apiKey) {
             console.error('OPENROUTER_API_KEY not configured');
             return res.status(500).json({ error: 'AI service not configured' });
@@ -262,16 +283,20 @@ app.post('/api/chat', async (req, res, next) => {
             { role: 'user', content: message }
         ];
         // Use OpenRouter with fallback models for reliability
-        // Default: Use environment variable, or request-specific model
-        const model = requestModel || process.env.AI_MODEL || 'google/gemini-2.0-flash-exp:free';
+        // Default: Use request-specific model, then environment overrides
+        const model = requestModel || process.env.OPENROUTER_MODEL || process.env.AI_MODEL || 'google/gemini-2.0-flash-exp:free';
+        const temperatureEnv = process.env.AI_TEMPERATURE ? Number(process.env.AI_TEMPERATURE) : undefined;
+        const temperature = Number.isFinite(temperatureEnv) ? Number(temperatureEnv) : 0.7;
+        const maxTokensEnv = process.env.AI_MAX_TOKENS ? Number(process.env.AI_MAX_TOKENS) : undefined;
+        const max_tokens = Number.isFinite(maxTokensEnv) ? Number(maxTokensEnv) : 2000;
         const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
             model: model,
             messages: messages.map(msg => ({
                 role: msg.role,
                 content: msg.content
             })),
-            temperature: 0.7,
-            max_tokens: 2000,
+            temperature,
+            max_tokens,
             top_p: 0.95,
             top_k: 40,
             frequency_penalty: 0.5,
