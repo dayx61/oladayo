@@ -1,6 +1,6 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "outputDirectory": "client/dist",
   "functions": {
     "api/index.ts": {
       "runtime": "nodejs20.x",
