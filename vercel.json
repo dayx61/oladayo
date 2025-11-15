@@ -1,18 +1,17 @@
 {
-  "buildCommand": "cd client && npm install && npm run build",
-  "outputDirectory": "client/dist",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "functions": {
-    "api/chat.ts": {
-      "runtime": "nodejs20.x"
-    },
-    "api/contact.ts": {
-      "runtime": "nodejs20.x"
-    },
-    "api/health.ts": {
-      "runtime": "nodejs20.x"
-    },
-    "api/portfolio.ts": {
-      "runtime": "nodejs20.x"
+    "api/index.ts": {
+      "runtime": "nodejs20.x",
+      "memory": 1024,
+      "maxDuration": 60
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.ts"
+    }
+  ]
 }
