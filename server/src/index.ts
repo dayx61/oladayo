@@ -57,6 +57,12 @@ function isGreeting(message: string): boolean {
   return ['hi', 'hello', 'hey', 'yo', 'hola', 'howdy'].includes(trimmed) || /^hi[\s!.,]*$/i.test(message) || /^hello[\s!.,]*$/i.test(message);
 }
 
+const withRouteVariants = (path: string): string[] => {
+  if (!path.startsWith('/api')) return [path];
+  const trimmed = path.replace('/api', '') || '/';
+  return [path, trimmed];
+};
+
 // Portfolio data
 const portfolioData = {
   name: 'Oladayo Alabi',
@@ -293,7 +299,8 @@ Feel free to reach out for professional discussions, career opportunities, or to
 }
 
 // AI Chat endpoint
-app.post('/api/chat', async (req: Request, res: Response, next: NextFunction) => {
+withRouteVariants('/api/chat').forEach((route) =>
+app.post(route, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { message, conversationHistory = [], category, model: requestModel } = req.body as ChatRequest & { model?: string };
 
@@ -458,18 +465,21 @@ app.post('/api/chat', async (req: Request, res: Response, next: NextFunction) =>
       code: 'INTERNAL_ERROR'
     });
   }
-});
+}));
 
 // Portfolio data endpoint
-app.get('/api/portfolio', (req: Request, res: Response) => {
-  res.json({
-    success: true,
-    data: portfolioData
-  });
-});
+withRouteVariants('/api/portfolio').forEach((route) =>
+  app.get(route, (req: Request, res: Response) => {
+    res.json({
+      success: true,
+      data: portfolioData
+    });
+  })
+);
 
 // Contact endpoint
-app.post('/api/contact', async (req: Request, res: Response, next: NextFunction) => {
+withRouteVariants('/api/contact').forEach((route) =>
+app.post(route, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, email, subject, message } = req.body as ContactRequest;
 
@@ -517,12 +527,15 @@ app.post('/api/contact', async (req: Request, res: Response, next: NextFunction)
     console.error('Contact error:', error);
     next(error);
   }
-});
+})
+);
 
 // Health check
-app.get('/api/health', (req: Request, res: Response) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+withRouteVariants('/api/health').forEach((route) =>
+  app.get(route, (req: Request, res: Response) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  })
+);
 
 // Error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

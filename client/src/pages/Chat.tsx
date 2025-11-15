@@ -68,7 +68,7 @@ export default function Chat() {
       return `http://localhost:${port}/api`;
     }
 
-    return isBrowser ? `${window.location.origin}/api` : '';
+    return isBrowser ? '/api' : '';
   };
 
   const scrollToBottom = () => {

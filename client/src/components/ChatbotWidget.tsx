@@ -6,7 +6,32 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp?: string;
+  source?: string;
 }
+
+const PORTFOLIO_FALLBACK = `Oladayo is an IT leader with 7+ years across six organizations, focused on secure, reliable operations.
+
+- Strengths: zero-trust security, automation, incident response, and SLA-driven support
+- Impact: 96% user satisfaction, 0 major incidents in 18 months, 45% faster ticket-to-fix via automation
+- Platforms: cloud + on-prem modernization, ITSM, and enterprise support for 800+ users
+- Leadership: builds and mentors teams, aligns IT KPIs to business outcomes
+- Contact: alabioladayoibrahim@hotmail.com • +1 267-957-4048 • LinkedIn: /in/olaalabi53`;
+
+const getApiBase = () => {
+  const env = (typeof import.meta !== 'undefined' ? (import.meta as any).env : {}) || {};
+  const explicit = env.VITE_API_URL;
+  if (explicit) return explicit;
+
+  const isBrowser = typeof window !== 'undefined';
+  const isLocal = isBrowser && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+  if (isLocal) {
+    const port = env.VITE_API_PORT || '5002';
+    return `http://localhost:${port}/api`;
+  }
+
+  return isBrowser ? '/api' : '';
+};
 
 export default function ChatbotWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,6 +44,7 @@ export default function ChatbotWidget() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -29,13 +55,27 @@ export default function ChatbotWidget() {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    const apiBase = getApiBase();
+    if (!apiBase) {
+      setApiStatus('offline');
+      return;
+    }
+    axios
+      .get(`${apiBase}/health`, { timeout: 5000 })
+      .then(() => setApiStatus('online'))
+      .catch(() => setApiStatus('offline'));
+  }, []);
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
 
+    const textToSend = input.trim();
+
     const userMessage: Message = {
       role: 'user',
-      content: input,
+      content: textToSend,
       timestamp: new Date().toISOString()
     };
     setMessages(prev => [...prev, userMessage]);
@@ -43,44 +83,59 @@ export default function ChatbotWidget() {
     setLoading(true);
 
     try {
-      // Determine API URL based on environment
-      const apiUrl = process.env.REACT_APP_API_URL || 
-                     (typeof window !== 'undefined' && window.location.hostname === 'localhost' 
-                       ? 'http://localhost:5001' 
-                       : 'https://oladayo-portfolio-server.vercel.app');
-      
-      const response = await axios.post(`${apiUrl}/api/chat`, {
-        message: input,
+      const apiBase = getApiBase();
+      if (!apiBase) throw new Error('API base URL is not configured');
+
+      const response = await axios.post(`${apiBase}/chat`, {
+        message: textToSend,
         conversationHistory: messages.map(m => ({ role: m.role, content: m.content })),
         category: 'general'
       }, {
         timeout: 30000
       });
 
-      const assistantMessage: Message = {
-        role: 'assistant',
-        content: response.data.message,
-        timestamp: new Date().toISOString()
-      };
-      setMessages(prev => [...prev, assistantMessage]);
+      if (response.data.fallback) {
+        const fallbackMessage: Message = {
+          role: 'assistant',
+          content: response.data.message,
+          timestamp: new Date().toISOString(),
+          source: response.data.source || 'Smart Portfolio Assistant'
+        };
+        setMessages(prev => [...prev, fallbackMessage]);
+      } else {
+        const assistantMessage: Message = {
+          role: 'assistant',
+          content: response.data.message,
+          timestamp: new Date().toISOString(),
+          source: response.data.source || 'OpenRouter AI'
+        };
+        setMessages(prev => [...prev, assistantMessage]);
+      }
+      setApiStatus('online');
     } catch (error: any) {
       console.error('Chat error:', error);
       let errorContent = 'Sorry, I encountered an error. Please try again.';
       
-      if (error.response?.data?.details) {
+      if (error.response?.data?.message && error.response?.data?.code) {
+        errorContent = error.response.data.message;
+      } else if (error.response?.data?.details) {
         errorContent = error.response.data.details;
       } else if (error.code === 'ECONNABORTED') {
         errorContent = 'Request timeout. The AI service took too long to respond. Please try again.';
       } else if (error.message === 'Network Error') {
         errorContent = 'Network error. Please check your connection.';
+      } else if (error.response?.data?.error) {
+        errorContent = error.response.data.error;
       }
       
       const errorMessage: Message = {
         role: 'assistant',
-        content: `⚠️ ${errorContent}`,
-        timestamp: new Date().toISOString()
+        content: `⚠️ Connection hiccup (${errorContent}).\n\nHere’s a quick profile while I reconnect:\n${PORTFOLIO_FALLBACK}`,
+        timestamp: new Date().toISOString(),
+        source: 'Portfolio Snapshot'
       };
       setMessages(prev => [...prev, errorMessage]);
+      setApiStatus('offline');
     } finally {
       setLoading(false);
     }
@@ -115,7 +170,20 @@ export default function ChatbotWidget() {
             </div>
             <div>
               <h3 className="text-lg font-bold text-white">AI Assistant</h3>
-              <p className="text-xs text-gray-400">Powered by OpenRouter</p>
+              <p className="text-[11px] text-gray-400 flex items-center gap-1">
+                <span
+                  className={`h-2 w-2 rounded-full ${
+                    apiStatus === 'online'
+                      ? 'bg-emerald-400'
+                      : apiStatus === 'checking'
+                      ? 'bg-amber-300'
+                      : 'bg-red-400'
+                  }`}
+                ></span>
+                {apiStatus === 'online' && 'Connected to OpenRouter'}
+                {apiStatus === 'checking' && 'Checking connection…'}
+                {apiStatus === 'offline' && 'Offline — showing snapshot'}
+              </p>
             </div>
           </div>
           <button
