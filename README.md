@@ -8,6 +8,8 @@
 
 A cutting-edge, full-stack portfolio website showcasing modern web technologies with AI-powered features, dark/light theme switching, premium animations, and comprehensive professional information.
 
+Reusable master README template for future repos: [README_TEMPLATE.md](README_TEMPLATE.md)
+
 ## ✨ **Key Features & Technologies**
 
 ### 🎨 **Premium Design System**
